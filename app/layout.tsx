@@ -12,8 +12,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ShipQR — Logistics Document Platform",
-  description: "Generate QR-linked shipping documents for instant field access",
+  title: "Community Statements — financial reports from your bank statement",
+  description:
+    "Guided preparation of compliant Tier 3 and Tier 4 performance reports for NZ community organisations",
 };
 
 export default function RootLayout({
@@ -23,10 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className="dark">
+      <html lang="en">
         <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
           {children}
-          <Toaster richColors theme="dark" position="top-right" />
+          <Toaster richColors position="top-right" />
         </body>
       </html>
     </ClerkProvider>
