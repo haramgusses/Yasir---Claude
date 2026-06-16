@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Logo } from "@/components/brand/Logo";
+import { Button } from "@/components/ui/Button";
 
 // Setup asks only for facts the data can't tell us (PLAN §3.5, §7):
 // identity, balance date, GST, sector, prior-years spend band, and the
@@ -55,8 +57,10 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-xl mx-auto px-4">
+    <div className="min-h-screen bg-slate-50">
+      <div className="h-1 bg-brand-gradient" />
+      <div className="mx-auto max-w-xl px-4 py-12">
+        <Logo className="mb-8" />
         <h1 className="text-2xl font-semibold text-slate-900">
           Tell us about your organisation
         </h1>
@@ -65,7 +69,7 @@ export default function OnboardingPage() {
           you the rest of the way. We work out the right report format for you.
         </p>
 
-        <form onSubmit={submit} className="mt-8 space-y-6 bg-white rounded-xl border border-slate-200 p-6">
+        <form onSubmit={submit} className="mt-8 space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
           <div>
             <label className={labelCls} htmlFor="name">Organisation name</label>
             <input id="name" required className={inputCls} value={form.name}
@@ -157,10 +161,9 @@ export default function OnboardingPage() {
             </span>
           </label>
 
-          <button type="submit" disabled={busy}
-            className="w-full rounded-lg bg-performa-teal text-white py-2.5 text-sm font-medium hover:bg-performa-navy disabled:opacity-50">
+          <Button type="submit" loading={busy} size="lg" className="w-full">
             {busy ? "Setting up…" : "Continue to upload"}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

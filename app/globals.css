@@ -4,76 +4,80 @@
 
 @layer base {
   :root {
-    /* Dark-only theme — values set directly on :root */
-    --background: 160 100% 3%;
-    --foreground: 0 0% 79%;
-
-    --card: 207 43% 16%;
-    --card-foreground: 0 0% 79%;
-
-    --popover: 207 43% 14%;
-    --popover-foreground: 0 0% 79%;
-
-    --primary: 348 88% 39%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 207 43% 20%;
-    --secondary-foreground: 0 0% 79%;
-
-    --muted: 207 43% 20%;
-    --muted-foreground: 0 0% 55%;
-
-    --accent: 48 100% 50%;
-    --accent-foreground: 160 100% 3%;
-
-    --destructive: 0 62% 38%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 207 40% 22%;
-    --input: 207 40% 22%;
-    --ring: 348 88% 39%;
-
     --radius: 0.75rem;
   }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    @apply border-slate-200;
   }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+  h1, h2, h3 {
+    @apply tracking-tight;
   }
 }
 
-/* Print: only show the QR label card */
-@media print {
-  body > * {
-    display: none !important;
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #112a61 0%, #11a4ac 62%, #30cfc3 100%);
   }
-  #qr-label-print {
-    display: block !important;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  .bg-brand-onyx {
+    background-color: #262626;
+    background-image: radial-gradient(
+      120% 120% at 50% 0%,
+      rgba(17, 164, 172, 0.18) 0%,
+      rgba(38, 38, 38, 0) 55%
+    );
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(135deg, #112a61, #11a4ac);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out both;
+  }
+  .animate-rise {
+    animation: rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Scrollbar styling */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  width: 11px;
+  height: 11px;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 3px;
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: #94a3b8;
+  background-clip: content-box;
+}
+
+/* Print: drop the app chrome and show the statement on clean white paper. */
+@media print {
+  body {
+    background: #fff !important;
+  }
+  @page {
+    margin: 16mm;
+  }
 }

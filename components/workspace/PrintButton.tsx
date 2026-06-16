@@ -1,14 +1,18 @@
 "use client";
 
+import { Printer } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+
 export default function PrintButton({ disabled }: { disabled?: boolean }) {
   return (
-    <button
+    <Button
       type="button"
+      size="sm"
       disabled={disabled}
       onClick={() => window.print()}
-      title={disabled ? "Resolve the items below first" : "Print or save as PDF"}
-      className="rounded-lg bg-performa-teal px-3 py-1.5 text-sm text-white hover:bg-performa-navy disabled:opacity-40">
+      title={disabled ? "Resolve the items below first" : "Print or save as PDF"}>
+      <Printer className="h-4 w-4" />
       Print draft
-    </button>
+    </Button>
   );
 }

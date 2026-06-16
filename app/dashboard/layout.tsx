@@ -13,16 +13,17 @@ export default async function DashboardLayout({
   if (!userId) redirect("/sign-in");
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-50 print:hidden">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div className="min-h-screen bg-slate-50 print:bg-white">
+      <div className="h-1 bg-brand-gradient print:hidden" />
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur print:hidden">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/dashboard" aria-label="Performa home">
             <Logo />
           </Link>
           <UserButton afterSignOutUrl="/sign-in" />
         </div>
       </header>
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">{children}</main>
     </div>
   );
 }
