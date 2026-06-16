@@ -30,7 +30,7 @@ export default async function YearLayout({
   return (
     <div>
       <div className="mb-1 text-xs text-slate-500 print:hidden">
-        <Link href="/dashboard" className="hover:text-emerald-700">{year.org.name}</Link>
+        <Link href="/dashboard" className="hover:text-performa-teal">{year.org.name}</Link>
         {" · "}Year ended {year.endDate.toISOString().slice(0, 10)}
       </div>
       <StepNav

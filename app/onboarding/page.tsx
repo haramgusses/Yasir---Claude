@@ -19,7 +19,7 @@ const PACKS = [
 ];
 
 const inputCls =
-  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 bg-white";
+  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-teal bg-white";
 const labelCls = "block text-sm font-medium text-slate-700 mb-1";
 
 export default function OnboardingPage() {
@@ -158,7 +158,7 @@ export default function OnboardingPage() {
           </label>
 
           <button type="submit" disabled={busy}
-            className="w-full rounded-lg bg-emerald-700 text-white py-2.5 text-sm font-medium hover:bg-emerald-800 disabled:opacity-50">
+            className="w-full rounded-lg bg-performa-teal text-white py-2.5 text-sm font-medium hover:bg-performa-navy disabled:opacity-50">
             {busy ? "Setting up…" : "Continue to upload"}
           </button>
         </form>

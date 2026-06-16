@@ -15,11 +15,13 @@ const config: Config = {
     },
     extend: {
       colors: {
-        burgundy: "#BA0C2F",
-        "app-yellow": "#FFCD00",
-        navy: "#172A3A",
-        "app-black": "#00100B",
-        silver: "#C9C9C9",
+        // Performa brand palette
+        performa: {
+          navy: "#112A61",
+          teal: "#11A4AC",
+          cyan: "#30CFC3",
+          onyx: "#262626",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

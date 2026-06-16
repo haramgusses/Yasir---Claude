@@ -12,7 +12,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Community Statements — financial reports from your bank statement",
+  title: "Performa — financial statements from your bank statement",
   description:
     "Guided preparation of compliant Tier 3 and Tier 4 performance reports for NZ community organisations",
 };

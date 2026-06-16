@@ -157,7 +157,7 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
           </ul>
         )}
         {ready && warnings.length === 0 && (
-          <p className="mt-2 text-sm text-emerald-700">
+          <p className="mt-2 text-sm text-performa-teal">
             All checks pass. This draft still needs your committee&apos;s approval and
             signatures before filing.
           </p>

@@ -60,7 +60,7 @@ export default function CategoriseQueue({
         <p className="text-lg font-medium text-slate-900">All transactions categorised 🎉</p>
         <p className="mt-1 text-sm text-slate-600">
           {doneCount} transactions are allocated. Head to{" "}
-          <a className="text-emerald-700 underline" href={`/dashboard/${yearId}/review`}>
+          <a className="text-performa-teal underline" href={`/dashboard/${yearId}/review`}>
             Review &amp; report
           </a>{" "}
           to see your draft statements.
@@ -153,7 +153,7 @@ function GroupCard({
           <div className="font-medium text-slate-900 text-sm">{group.key}</div>
           <div className="text-xs text-slate-500">
             {group.lines.length} transaction{group.lines.length === 1 ? "" : "s"} ·{" "}
-            <span className={group.totalCents >= 0 ? "text-emerald-700" : "text-slate-700"}>
+            <span className={group.totalCents >= 0 ? "text-performa-teal" : "text-slate-700"}>
               {nzd(group.totalCents)} {group.totalCents >= 0 ? "in" : "out"}
             </span>
             <span className="ml-1 underline decoration-dotted">{expanded ? "hide" : "show"}</span>
@@ -171,7 +171,7 @@ function GroupCard({
             <option value={NEW}>＋ New category…</option>
           </select>
           <button onClick={apply} disabled={busy || !choice || (choice === NEW && !newName.trim())}
-            className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm text-white hover:bg-emerald-800 disabled:opacity-40">
+            className="rounded-lg bg-performa-teal px-3 py-1.5 text-sm text-white hover:bg-performa-navy disabled:opacity-40">
             {busy ? "Saving…" : "Apply"}
           </button>
         </div>
@@ -199,11 +199,11 @@ function GroupCard({
       )}
 
       {needsFunder && (
-        <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-200 p-3">
-          <label className="text-xs font-medium text-emerald-900">
+        <div className="mt-3 rounded-lg bg-performa-teal/10 border border-performa-teal/30 p-3">
+          <label className="text-xs font-medium text-performa-navy">
             Who was this funding from? (shown in your report&apos;s grants note)
           </label>
-          <input className="mt-1 w-full rounded-lg border border-emerald-300 px-2 py-1.5 text-sm bg-white"
+          <input className="mt-1 w-full rounded-lg border border-performa-teal/40 px-2 py-1.5 text-sm bg-white"
             placeholder="e.g. Lottery Grants Board" value={funder}
             onChange={(e) => setFunder(e.target.value)} />
         </div>

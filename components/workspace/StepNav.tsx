@@ -29,7 +29,7 @@ export default function StepNav({
             className={cn(
               "px-4 py-2.5 text-sm border-b-2 -mb-px",
               active
-                ? "border-emerald-700 text-emerald-800 font-medium"
+                ? "border-performa-teal text-performa-navy font-medium"
                 : "border-transparent text-slate-600 hover:text-slate-900"
             )}>
             {s.label}

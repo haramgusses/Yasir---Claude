@@ -103,7 +103,7 @@ export default function UploadPanel({
         <div key={a.id} className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between">
             <div className="font-medium text-slate-900">{a.name}</div>
-            <label className="cursor-pointer rounded-lg bg-emerald-700 px-3 py-1.5 text-sm text-white hover:bg-emerald-800">
+            <label className="cursor-pointer rounded-lg bg-performa-teal px-3 py-1.5 text-sm text-white hover:bg-performa-navy">
               {busy === a.id ? "Reading…" : "Upload CSV"}
               <input type="file" accept=".csv,text/csv" className="hidden" disabled={busy !== null}
                 onChange={(e) => {
@@ -127,7 +127,7 @@ export default function UploadPanel({
                     </span>
                   </div>
                   {b.verified ? (
-                    <span className="text-xs font-medium text-emerald-700">✓ Balances</span>
+                    <span className="text-xs font-medium text-performa-teal">✓ Balances</span>
                   ) : (
                     <BalanceForm yearId={yearId} batchId={b.id} onDone={() => router.refresh()} />
                   )}
@@ -163,12 +163,12 @@ function AddAccountForm({
   return (
     <form onSubmit={onSubmit} className="flex gap-2">
       <input
-        className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+        className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-performa-teal"
         placeholder='Add a bank account, e.g. "Everyday account" or "Savings"'
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
-      <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:border-emerald-600">
+      <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:border-performa-teal">
         Add account
       </button>
     </form>
@@ -235,7 +235,7 @@ function BalanceForm({
         onChange={(e) => setClosing(e.target.value)}
         className="w-28 rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
       <button disabled={busy}
-        className="rounded bg-emerald-700 px-2 py-1 text-xs text-white disabled:opacity-40">
+        className="rounded bg-performa-teal px-2 py-1 text-xs text-white disabled:opacity-40">
         Check
       </button>
     </form>

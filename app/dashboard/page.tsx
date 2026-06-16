@@ -22,7 +22,7 @@ export default async function DashboardPage() {
       <div className="mt-6 space-y-3">
         {org.years.map((y) => (
           <Link key={y.id} href={`/dashboard/${y.id}/upload`}
-            className="block rounded-xl border border-slate-200 bg-white p-4 hover:border-emerald-600">
+            className="block rounded-xl border border-slate-200 bg-white p-4 hover:border-performa-teal">
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-medium text-slate-900">
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
                   {y.detectedTier ? ` · ${y.detectedTier === "TIER_4" ? "Tier 4 (simple cash format)" : "Tier 3 (accrual format)"}` : ""}
                 </div>
               </div>
-              <span className="text-sm text-emerald-700">Open &rarr;</span>
+              <span className="text-sm text-performa-teal">Open &rarr;</span>
             </div>
           </Link>
         ))}
