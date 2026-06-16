@@ -586,7 +586,7 @@ reports) flag.
 
 ## 10. Architecture on the existing stack
 
-Keep: Next.js 14 App Router, Prisma/Postgres (Supabase), Clerk, UploadThing, shadcn/ui,
+Keep: Next.js 14 App Router, Prisma/Postgres (Supabase), Clerk, shadcn/ui,
 zod, react-hook-form. Add: a parsing service (server-side, Node; `xlsx`/`papaparse`;
 `pdfjs` for text-layer PDFs), LLM categorisation via Claude API (batch; suggestions
 only), `docx` for Word export, headless Chromium (or `@react-pdf`) for PDF. Replace the
