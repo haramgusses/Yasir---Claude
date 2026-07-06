@@ -8,6 +8,7 @@ import { nzd } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import NewYearButton from "@/components/workspace/NewYearButton";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-in space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">{org.name}</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Pick a financial year to keep working on its performance report.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">{org.name}</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Pick a financial year to keep working on its performance report.
+          </p>
+        </div>
+        <NewYearButton />
       </div>
 
       <div className="space-y-4">

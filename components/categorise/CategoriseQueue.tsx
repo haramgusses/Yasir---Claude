@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowDownLeft, ArrowUpRight, Sparkles, PartyPopper, ChevronRight } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Sparkles,
+  PartyPopper,
+  ChevronRight,
+  Search,
+  Undo2,
+  Zap,
+} from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -37,71 +46,304 @@ interface ComplianceOption {
   label: string;
   funderPrompt: boolean;
 }
+interface DoneGroup {
+  category: string;
+  payee: string;
+  funder: string | null;
+  sourceIds: string[];
+  totalCents: number;
+}
 
 const NEW = "__new__";
 const FUNDER_PROMPT_MIN_CENTS = 50_000;
+const BULK_CONFIDENCE = 0.85;
 
 export default function CategoriseQueue({
   yearId,
   groups,
   categories,
   complianceOptions,
-  doneCount,
+  doneGroups,
 }: {
   yearId: string;
   groups: Group[];
   categories: Category[];
   complianceOptions: ComplianceOption[];
-  doneCount: number;
+  doneGroups: DoneGroup[];
 }) {
   const router = useRouter();
+  const [tab, setTab] = useState<"todo" | "done">("todo");
+  const [query, setQuery] = useState("");
+  const [dir, setDir] = useState<"all" | "in" | "out">("all");
+  const [bulkBusy, setBulkBusy] = useState(false);
 
-  if (groups.length === 0) {
-    return (
-      <Card className="p-10 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-performa-teal/10">
-          <PartyPopper className="h-6 w-6 text-performa-teal" />
-        </div>
-        <p className="mt-3 text-lg font-semibold text-slate-900">Every transaction is categorised</p>
-        <p className="mx-auto mt-1 max-w-md text-sm text-slate-600">
-          All {doneCount} transactions are sorted. Next, review your draft statements and
-          check everything looks right.
-        </p>
-        <a
-          href={`/dashboard/${yearId}/review`}
-          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-navy">
-          Review &amp; report <ChevronRight className="h-4 w-4" />
-        </a>
-      </Card>
-    );
-  }
+  const needsFunder = (code: string, totalCents: number) =>
+    !!complianceOptions.find((o) => o.code === code)?.funderPrompt &&
+    totalCents >= FUNDER_PROMPT_MIN_CENTS;
+
+  // High-confidence suggestions that don't need the funder question can be
+  // accepted in one click; funder-question groups stay for individual
+  // attention so granularity is never skipped.
+  const bulkEligible = useMemo(
+    () =>
+      groups.filter(
+        (g) =>
+          g.suggestion &&
+          g.suggestion.confidence >= BULK_CONFIDENCE &&
+          !needsFunder(g.suggestion.complianceCode, g.totalCents)
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [groups]
+  );
+
+  const filtered = useMemo(
+    () =>
+      groups.filter(
+        (g) =>
+          (dir === "all" || (dir === "in" ? g.totalCents >= 0 : g.totalCents < 0)) &&
+          (query.trim() === "" || g.key.toLowerCase().includes(query.trim().toLowerCase()))
+      ),
+    [groups, dir, query]
+  );
 
   const remaining = groups.reduce((n, g) => n + g.lines.length, 0);
+  const doneCount = doneGroups.reduce((n, g) => n + g.sourceIds.length, 0);
+
+  async function acceptAll() {
+    setBulkBusy(true);
+    const res = await fetch(`/api/years/${yearId}/categorise/bulk`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assignments: bulkEligible.map((g) => ({
+          transactionIds: g.lines.map((l) => l.id),
+          name: g.suggestion!.categoryName,
+          complianceCode: g.suggestion!.complianceCode,
+        })),
+      }),
+    });
+    setBulkBusy(false);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      toast.error(body.error ?? "Couldn't apply the suggestions — please try again.");
+      return;
+    }
+    const body = await res.json();
+    toast.success(`${body.allocated} transactions categorised in one go.`);
+    router.refresh();
+  }
+
+  async function undo(g: DoneGroup) {
+    const res = await fetch(`/api/years/${yearId}/categorise`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sourceIds: g.sourceIds }),
+    });
+    if (!res.ok) {
+      toast.error("Couldn't undo that — please try again.");
+      return;
+    }
+    toast.success(`"${g.payee}" moved back to the queue.`);
+    router.refresh();
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-baseline justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">
-            {remaining} transaction{remaining === 1 ? "" : "s"} to sort
-          </h2>
-          <p className="text-sm text-slate-600">
-            Grouped by who they&apos;re from or to, so one choice covers many. We&apos;ve
-            suggested categories where we can — start at the top.
-          </p>
-        </div>
+      {/* Tabs */}
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-sm font-medium">
+        <TabButton active={tab === "todo"} onClick={() => setTab("todo")}>
+          To sort{remaining > 0 ? ` · ${remaining}` : ""}
+        </TabButton>
+        <TabButton active={tab === "done"} onClick={() => setTab("done")}>
+          Sorted{doneCount > 0 ? ` · ${doneCount}` : ""}
+        </TabButton>
       </div>
-      {groups.map((g) => (
-        <GroupCard
-          key={g.key}
-          yearId={yearId}
-          group={g}
-          categories={categories}
-          complianceOptions={complianceOptions}
-          onDone={() => router.refresh()}
-        />
-      ))}
+
+      {tab === "todo" && groups.length === 0 && (
+        <Card className="p-10 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-performa-teal/10">
+            <PartyPopper className="h-6 w-6 text-performa-teal" />
+          </div>
+          <p className="mt-3 text-lg font-semibold text-slate-900">Every transaction is categorised</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-slate-600">
+            All {doneCount} transactions are sorted. Next, review your draft statements
+            and check everything looks right. Spot a mistake? The Sorted tab lets you undo.
+          </p>
+          <a
+            href={`/dashboard/${yearId}/review`}
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-navy">
+            Review &amp; report <ChevronRight className="h-4 w-4" />
+          </a>
+        </Card>
+      )}
+
+      {tab === "todo" && groups.length > 0 && (
+        <>
+          {bulkEligible.length > 1 && (
+            <Card className="flex flex-col gap-3 border-performa-teal/30 bg-performa-teal/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-performa-teal/15">
+                  <Zap className="h-4 w-4 text-performa-teal" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    {bulkEligible.length} groups have confident suggestions
+                  </p>
+                  <p className="text-xs text-slate-600">
+                    Accept them all in one click — you can undo anything from the Sorted
+                    tab. Grants that need a funder name stay here for you.
+                  </p>
+                </div>
+              </div>
+              <Button onClick={acceptAll} loading={bulkBusy} className="shrink-0">
+                <Sparkles className="h-4 w-4" />
+                Accept {bulkEligible.length} suggestions
+              </Button>
+            </Card>
+          )}
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name…"
+                className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-performa-teal"
+              />
+            </div>
+            <div className="flex gap-1 rounded-lg bg-slate-100 p-1 text-xs font-medium">
+              {(
+                [
+                  ["all", "All"],
+                  ["in", "Money in"],
+                  ["out", "Money out"],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setDir(value)}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 transition-colors",
+                    dir === value ? "bg-white text-performa-navy shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filtered.length === 0 ? (
+            <Card className="p-8 text-center text-sm text-slate-500">
+              Nothing matches that search — try different words or clear the filter.
+            </Card>
+          ) : (
+            filtered.map((g) => (
+              <GroupCard
+                key={g.key}
+                yearId={yearId}
+                group={g}
+                categories={categories}
+                complianceOptions={complianceOptions}
+                onDone={() => router.refresh()}
+              />
+            ))
+          )}
+        </>
+      )}
+
+      {tab === "done" &&
+        (doneGroups.length === 0 ? (
+          <Card className="p-8 text-center text-sm text-slate-500">
+            Nothing sorted yet — categorised transactions will appear here, and you can
+            undo any of them.
+          </Card>
+        ) : (
+          <DoneList doneGroups={doneGroups} onUndo={undo} />
+        ))}
     </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex-1 rounded-lg px-4 py-2 transition-colors",
+        active ? "bg-white text-performa-navy shadow-sm" : "text-slate-500 hover:text-slate-700"
+      )}>
+      {children}
+    </button>
+  );
+}
+
+function DoneList({
+  doneGroups,
+  onUndo,
+}: {
+  doneGroups: DoneGroup[];
+  onUndo: (g: DoneGroup) => Promise<void>;
+}) {
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  let lastCategory = "";
+
+  return (
+    <Card className="divide-y divide-slate-100 p-2">
+      {doneGroups.map((g) => {
+        const showHeader = g.category !== lastCategory;
+        lastCategory = g.category;
+        const key = `${g.category}|${g.payee}`;
+        return (
+          <div key={key}>
+            {showHeader && (
+              <div className="px-3 pb-1 pt-4 text-xs font-semibold uppercase tracking-wide text-slate-400 first:pt-2">
+                {g.category}
+              </div>
+            )}
+            <div className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-slate-50">
+              <div className="min-w-0 text-sm">
+                <span className="truncate text-slate-800">{g.payee}</span>
+                <span className="ml-2 text-xs text-slate-500">
+                  {g.sourceIds.length} transaction{g.sourceIds.length === 1 ? "" : "s"}
+                  {g.funder ? ` · from ${g.funder}` : ""}
+                </span>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                <span
+                  className={cn(
+                    "text-sm font-medium tabular-nums",
+                    g.totalCents >= 0 ? "text-emerald-600" : "text-slate-700"
+                  )}>
+                  {nzd(g.totalCents)}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  loading={busyKey === key}
+                  onClick={async () => {
+                    setBusyKey(key);
+                    await onUndo(g);
+                    setBusyKey(null);
+                  }}>
+                  <Undo2 className="h-3.5 w-3.5" /> Undo
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </Card>
   );
 }
 
@@ -165,7 +407,9 @@ function GroupCard({
       toast.error(body.error ?? "Couldn't save that — please try again.");
       return;
     }
-    toast.success(`${group.lines.length} transaction${group.lines.length === 1 ? "" : "s"} categorised.`);
+    toast.success(
+      `${group.lines.length} transaction${group.lines.length === 1 ? "" : "s"} categorised.`
+    );
     onDone();
   }
 
@@ -174,7 +418,10 @@ function GroupCard({
   return (
     <Card className="animate-rise p-4">
       <div className="flex items-center justify-between gap-4">
-        <button type="button" onClick={() => setExpanded(!expanded)} className="flex min-w-0 items-center gap-3 text-left">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="flex min-w-0 items-center gap-3 text-left">
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
@@ -189,7 +436,9 @@ function GroupCard({
               <span className={isIn ? "font-medium text-emerald-600" : "font-medium text-slate-700"}>
                 {nzd(group.totalCents)} {isIn ? "in" : "out"}
               </span>
-              <span className="ml-1 underline decoration-dotted">{expanded ? "hide" : "details"}</span>
+              <span className="ml-1 underline decoration-dotted">
+                {expanded ? "hide" : "details"}
+              </span>
             </span>
           </span>
         </button>
@@ -221,10 +470,12 @@ function GroupCard({
       </div>
 
       {group.suggestion && conf && (
-        <div className="mt-2 flex items-center gap-2 pl-12 text-xs text-slate-500">
+        <div className="mt-2 flex flex-wrap items-center gap-2 pl-12 text-xs text-slate-500">
           <Sparkles className="h-3.5 w-3.5 text-performa-teal" />
           <span>
-            Suggested: <span className="font-medium text-slate-700">{group.suggestion.categoryName}</span> — {group.suggestion.rationale}
+            Suggested:{" "}
+            <span className="font-medium text-slate-700">{group.suggestion.categoryName}</span> —{" "}
+            {group.suggestion.rationale}
           </span>
           <Badge tone={conf.tone}>{conf.label}</Badge>
         </div>

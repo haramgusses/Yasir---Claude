@@ -81,3 +81,24 @@ export async function POST(req: Request, { params }: { params: { yearId: string 
 
   return NextResponse.json({ allocated: lines.length });
 }
+
+// Undo: remove the allocations for the given source transactions so they
+// return to the queue. Everything is reversible (PLAN §3, design rule 6).
+const DeleteBody = z.object({
+  sourceIds: z.array(z.string()).min(1).max(2000),
+});
+
+export async function DELETE(req: Request, { params }: { params: { yearId: string } }) {
+  const year = await requireYear(params.yearId);
+  if (!year) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const parsed = DeleteBody.safeParse(await req.json());
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+
+  const result = await prisma.transactionSplit.deleteMany({
+    where: {
+      sourceId: { in: parsed.data.sourceIds },
+      source: { batch: { yearId: year.id } },
+    },
+  });
+  return NextResponse.json({ removed: result.count });
+}

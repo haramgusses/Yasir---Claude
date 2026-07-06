@@ -53,6 +53,11 @@ export default async function UploadPage({ params }: { params: { yearId: string 
       yearStart={yearStart}
       yearEnd={yearEnd}
       accounts={data}
+      canContinue={
+        data.length > 0 &&
+        data.some((a) => a.batches.length > 0) &&
+        data.every((a) => a.batches.every((b) => b.verified))
+      }
     />
   );
 }

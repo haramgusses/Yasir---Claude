@@ -11,7 +11,7 @@ export default async function CategorisePage({ params }: { params: { yearId: str
   const year = await requireYear(params.yearId);
   if (!year) notFound();
 
-  const [lines, categories] = await Promise.all([
+  const [lines, categories, doneSplits] = await Promise.all([
     prisma.sourceTransaction.findMany({
       where: {
         batch: { yearId: year.id },
@@ -27,6 +27,15 @@ export default async function CategorisePage({ params }: { params: { yearId: str
       where: { orgId: year.orgId, archived: false },
       orderBy: { name: "asc" },
       select: { id: true, name: true, complianceCode: true },
+    }),
+    prisma.transactionSplit.findMany({
+      where: { source: { batch: { yearId: year.id } } },
+      select: {
+        amountCents: true,
+        category: { select: { name: true } },
+        funder: { select: { name: true } },
+        source: { select: { id: true, payee: true, particulars: true } },
+      },
     }),
   ]);
 
@@ -50,9 +59,30 @@ export default async function CategorisePage({ params }: { params: { yearId: str
   });
   groups.sort((a, b) => Math.abs(b.totalCents) - Math.abs(a.totalCents));
 
-  const done = await prisma.transactionSplit.count({
-    where: { source: { batch: { yearId: year.id } } },
-  });
+  // What's already sorted, grouped category → payee, with source ids so any
+  // group can be undone back into the queue.
+  const doneByKey = new Map<
+    string,
+    { category: string; payee: string; funder: string | null; sourceIds: string[]; totalCents: number }
+  >();
+  for (const s of doneSplits) {
+    const categoryName = s.category?.name ?? "(uncategorised)";
+    const payee = (s.source.payee || s.source.particulars || "(no description)")
+      .toUpperCase()
+      .replace(/\d{2,}/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const key = `${categoryName}|${payee}`;
+    const entry =
+      doneByKey.get(key) ??
+      { category: categoryName, payee, funder: s.funder?.name ?? null, sourceIds: [], totalCents: 0 };
+    entry.sourceIds.push(s.source.id);
+    entry.totalCents += s.amountCents;
+    doneByKey.set(key, entry);
+  }
+  const doneGroups = [...doneByKey.values()].sort(
+    (a, b) => a.category.localeCompare(b.category) || Math.abs(b.totalCents) - Math.abs(a.totalCents)
+  );
 
   return (
     <CategoriseQueue
@@ -64,7 +94,7 @@ export default async function CategorisePage({ params }: { params: { yearId: str
         label: c.label,
         funderPrompt: !!c.funderPrompt,
       }))}
-      doneCount={done}
+      doneGroups={doneGroups}
     />
   );
 }

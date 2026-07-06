@@ -150,16 +150,39 @@ export default function OnboardingPage() {
                 </label>
               ))}
             </div>
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-slate-500 underline decoration-dotted">
+                Why do we ask?
+              </summary>
+              <p className="mt-1 text-xs text-slate-500">
+                The law sets the report format by your spending over the last two
+                years: under $140,000 a year means a simple cash-based report
+                (Tier 4); over means a fuller one (Tier 3). A rough answer is fine —
+                we double-check against your actual transactions.
+              </p>
+            </details>
           </div>
 
-          <label className="flex items-start gap-2 text-sm text-slate-700">
-            <input type="checkbox" className="mt-0.5" checked={form.publicAccountability}
-              onChange={(e) => set("publicAccountability", e.target.checked)} />
-            <span>
-              We hold money or assets on behalf of other people or organisations
-              (as a trustee, nominee or agent) — beyond ordinary grants and donations.
-            </span>
-          </label>
+          <div>
+            <label className="flex items-start gap-2 text-sm text-slate-700">
+              <input type="checkbox" className="mt-0.5" checked={form.publicAccountability}
+                onChange={(e) => set("publicAccountability", e.target.checked)} />
+              <span>
+                We hold money or assets on behalf of other people or organisations
+                (as a trustee, nominee or agent) — beyond ordinary grants and donations.
+              </span>
+            </label>
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-slate-500 underline decoration-dotted">
+                Why do we ask?
+              </summary>
+              <p className="mt-1 text-xs text-slate-500">
+                Organisations that hold others&apos; money in trust have stricter
+                reporting rules. Almost all community groups can leave this unticked —
+                receiving grants and donations for your own work doesn&apos;t count.
+              </p>
+            </details>
+          </div>
 
           <Button type="submit" loading={busy} size="lg" className="w-full">
             {busy ? "Setting up…" : "Continue to upload"}

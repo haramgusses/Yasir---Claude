@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Building2,
   CheckCircle2,
@@ -10,7 +11,9 @@ import {
   FileSpreadsheet,
   Plus,
   CalendarClock,
+  ChevronRight,
 } from "lucide-react";
+import BankGuides from "@/components/upload/BankGuides";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -39,11 +42,13 @@ export default function UploadPanel({
   yearStart,
   yearEnd,
   accounts,
+  canContinue,
 }: {
   yearId: string;
   yearStart: string;
   yearEnd: string;
   accounts: Account[];
+  canContinue: boolean;
 }) {
   const router = useRouter();
   const [newAccount, setNewAccount] = useState("");
@@ -213,6 +218,30 @@ export default function UploadPanel({
           <Plus className="h-4 w-4" /> Add account
         </Button>
       </form>
+
+      {canContinue && (
+        <Card className="flex flex-col gap-3 border-performa-teal/30 bg-performa-teal/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-performa-teal" />
+            <div>
+              <p className="text-sm font-medium text-slate-900">
+                All statements verified — everything adds up
+              </p>
+              <p className="text-xs text-slate-600">
+                Got more accounts? Add them above. Otherwise you&apos;re ready to sort
+                your transactions.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/dashboard/${yearId}/categorise`}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-navy">
+            Continue to categorise <ChevronRight className="h-4 w-4" />
+          </Link>
+        </Card>
+      )}
+
+      <BankGuides />
     </div>
   );
 }
