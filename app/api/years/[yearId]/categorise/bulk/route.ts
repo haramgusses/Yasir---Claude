@@ -42,24 +42,28 @@ export async function POST(req: Request, { params }: { params: { yearId: string 
       create: { orgId: year.orgId, name: a.name, complianceCode: a.complianceCode },
       update: { archived: false },
     });
-    const lines = await prisma.sourceTransaction.findMany({
-      where: {
-        id: { in: a.transactionIds },
-        batch: { yearId: year.id },
-        splits: { none: {} },
-      },
-      select: { id: true, amountCents: true },
+    // Check-and-insert inside a transaction to narrow the double-allocation
+    // window; the review page's double-allocation check is the backstop.
+    allocated += await prisma.$transaction(async (tx) => {
+      const lines = await tx.sourceTransaction.findMany({
+        where: {
+          id: { in: a.transactionIds },
+          batch: { yearId: year.id },
+          splits: { none: {} },
+        },
+        select: { id: true, amountCents: true },
+      });
+      if (lines.length === 0) return 0;
+      await tx.transactionSplit.createMany({
+        data: lines.map((l) => ({
+          sourceId: l.id,
+          categoryId: cat.id,
+          amountCents: l.amountCents,
+          confirmedAt: new Date(),
+        })),
+      });
+      return lines.length;
     });
-    if (lines.length === 0) continue;
-    await prisma.transactionSplit.createMany({
-      data: lines.map((l) => ({
-        sourceId: l.id,
-        categoryId: cat.id,
-        amountCents: l.amountCents,
-        confirmedAt: new Date(),
-      })),
-    });
-    allocated += lines.length;
   }
 
   return NextResponse.json({ allocated });

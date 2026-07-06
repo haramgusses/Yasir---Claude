@@ -55,8 +55,9 @@ export default async function UploadPage({ params }: { params: { yearId: string 
       accounts={data}
       canContinue={
         data.length > 0 &&
-        data.some((a) => a.batches.length > 0) &&
-        data.every((a) => a.batches.every((b) => b.verified))
+        // Every account needs at least one verified statement — an account
+        // with no uploads must not vacuously pass the "all verified" check.
+        data.every((a) => a.batches.length > 0 && a.batches.every((b) => b.verified))
       }
     />
   );

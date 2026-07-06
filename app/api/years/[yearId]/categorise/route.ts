@@ -59,31 +59,39 @@ export async function POST(req: Request, { params }: { params: { yearId: string 
 
   // Allocate each full transaction to the category (single split in v0.1;
   // the data model already supports partial splits). Only lines in this
-  // year, owned by this org, and not yet allocated.
-  const lines = await prisma.sourceTransaction.findMany({
-    where: {
-      id: { in: b.transactionIds },
-      batch: { yearId: year.id },
-      splits: { none: {} },
-    },
-    select: { id: true, amountCents: true },
+  // year, owned by this org, and not yet allocated. The check-and-insert
+  // runs inside a transaction to narrow the double-allocation window; the
+  // review page's double-allocation check catches anything that slips past.
+  const allocated = await prisma.$transaction(async (tx) => {
+    const lines = await tx.sourceTransaction.findMany({
+      where: {
+        id: { in: b.transactionIds },
+        batch: { yearId: year.id },
+        splits: { none: {} },
+      },
+      select: { id: true, amountCents: true },
+    });
+    if (lines.length === 0) return 0;
+    await tx.transactionSplit.createMany({
+      data: lines.map((l) => ({
+        sourceId: l.id,
+        categoryId: categoryId!,
+        funderId,
+        amountCents: l.amountCents,
+        confirmedAt: new Date(),
+      })),
+    });
+    return lines.length;
   });
 
-  await prisma.transactionSplit.createMany({
-    data: lines.map((l) => ({
-      sourceId: l.id,
-      categoryId: categoryId!,
-      funderId,
-      amountCents: l.amountCents,
-      confirmedAt: new Date(),
-    })),
-  });
-
-  return NextResponse.json({ allocated: lines.length });
+  return NextResponse.json({ allocated });
 }
 
 // Undo: remove the allocations for the given source transactions so they
 // return to the queue. Everything is reversible (PLAN §3, design rule 6).
+// Deletes ALL splits for each source — correct while v0.1 creates a single
+// full-amount split per transaction, and doubles as the recovery path for
+// accidental double-allocation. Revisit when partial splits ship.
 const DeleteBody = z.object({
   sourceIds: z.array(z.string()).min(1).max(2000),
 });

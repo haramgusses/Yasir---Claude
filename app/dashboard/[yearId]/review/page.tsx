@@ -46,6 +46,25 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
       prisma.interviewAnswer.findMany({ where: { yearId: year.id } }),
     ]);
 
+  // Backstops: accounts with nothing uploaded this year, and transactions
+  // allocated more than once (a double-click race slipping past the
+  // client-side serialisation) — both would silently distort the numbers.
+  const [allAccounts, doubleAllocated] = await Promise.all([
+    prisma.bankAccount.findMany({
+      where: { orgId: year.orgId },
+      select: { id: true, name: true },
+    }),
+    prisma.transactionSplit.groupBy({
+      by: ["sourceId"],
+      where: { source: { batch: { yearId: year.id } } },
+      having: { sourceId: { _count: { gt: 1 } } },
+      _count: true,
+    }),
+  ]);
+  const accountsWithoutUploads = allAccounts.filter(
+    (a) => !accounts.some((x) => x.id === a.id)
+  );
+
   // Tier detection — computed, never asked (PLAN §7).
   const paymentsCents = splits
     .filter((s) => s.amountCents < 0)
@@ -102,6 +121,14 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
   for (const a of gapsByAccount)
     blockers.push(
       `"${a.name}" has missing periods: ${a.gaps.map((g) => `${g.fromDate} to ${g.toDate}`).join(", ")}.`
+    );
+  if (doubleAllocated.length > 0)
+    blockers.push(
+      `${doubleAllocated.length} transaction(s) were categorised twice (usually a double-click). Open Categorise → Sorted, undo the affected group, and apply it once.`
+    );
+  for (const a of accountsWithoutUploads)
+    warnings.push(
+      `No statements uploaded for "${a.name}" this year — if that account had any activity, its transactions are missing from this report.`
     );
   if (model.notes.funders.untaggedCents > 0)
     warnings.push(

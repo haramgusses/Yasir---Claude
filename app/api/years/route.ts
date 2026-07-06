@@ -18,6 +18,15 @@ export async function POST() {
   }
 
   const latest = org.years[0];
+
+  // Idempotence guard: if the most recent year hasn't been started (no
+  // uploads, no categorising), a repeat click almost certainly means the
+  // user didn't see it appear — return it rather than minting another year.
+  const activity = await prisma.importBatch.count({ where: { yearId: latest.id } });
+  if (activity === 0) {
+    return NextResponse.json({ yearId: latest.id });
+  }
+
   const start = new Date(latest.endDate);
   start.setUTCDate(start.getUTCDate() + 1);
   const end = new Date(latest.endDate);

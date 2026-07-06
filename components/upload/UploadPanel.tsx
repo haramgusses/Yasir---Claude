@@ -75,11 +75,18 @@ export default function UploadPanel({
       return;
     }
     setBusy(accountId);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("accountId", accountId);
-    const res = await fetch(`/api/years/${yearId}/import`, { method: "POST", body: fd });
-    setBusy(null);
+    let res: Response;
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("accountId", accountId);
+      res = await fetch(`/api/years/${yearId}/import`, { method: "POST", body: fd });
+    } catch {
+      toast.error("Upload failed — check your connection and try again.");
+      return;
+    } finally {
+      setBusy(null);
+    }
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
       toast.error(body.error ?? "That file couldn't be read.");
@@ -194,6 +201,16 @@ export default function UploadPanel({
             </ul>
           )}
 
+          {a.batches.length === 0 && accounts.some((x) => x.batches.length > 0) && (
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                No statements uploaded for this account yet — if it had any activity
+                this year, its transactions are missing from your report.
+              </span>
+            </div>
+          )}
+
           {a.batches.length > 0 && a.gaps.length > 0 && (
             <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
               <CalendarClock className="mt-0.5 h-4 w-4 shrink-0" />
@@ -265,16 +282,23 @@ function BalanceForm({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const res = await fetch(`/api/years/${yearId}/import`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        batchId,
-        openingBalanceCents: Math.round(parseFloat(opening) * 100),
-        closingBalanceCents: Math.round(parseFloat(closing) * 100),
-      }),
-    });
-    setBusy(false);
+    let res: Response;
+    try {
+      res = await fetch(`/api/years/${yearId}/import`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          batchId,
+          openingBalanceCents: Math.round(parseFloat(opening) * 100),
+          closingBalanceCents: Math.round(parseFloat(closing) * 100),
+        }),
+      });
+    } catch {
+      toast.error("Couldn't reach the server — check your connection and try again.");
+      return;
+    } finally {
+      setBusy(false);
+    }
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
       toast.error(body.error ?? "Couldn't save those balances.");

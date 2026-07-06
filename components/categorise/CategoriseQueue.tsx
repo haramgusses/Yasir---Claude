@@ -76,6 +76,9 @@ export default function CategoriseQueue({
   const [query, setQuery] = useState("");
   const [dir, setDir] = useState<"all" | "in" | "out">("all");
   const [bulkBusy, setBulkBusy] = useState(false);
+  // Serialise mutations client-side: bulk-accept and individual Apply must
+  // not run concurrently, or overlapping groups could be allocated twice.
+  const [cardsBusy, setCardsBusy] = useState(0);
 
   const needsFunder = (code: string, totalCents: number) =>
     !!complianceOptions.find((o) => o.code === code)?.funderPrompt &&
@@ -111,18 +114,25 @@ export default function CategoriseQueue({
 
   async function acceptAll() {
     setBulkBusy(true);
-    const res = await fetch(`/api/years/${yearId}/categorise/bulk`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        assignments: bulkEligible.map((g) => ({
-          transactionIds: g.lines.map((l) => l.id),
-          name: g.suggestion!.categoryName,
-          complianceCode: g.suggestion!.complianceCode,
-        })),
-      }),
-    });
-    setBulkBusy(false);
+    let res: Response;
+    try {
+      res = await fetch(`/api/years/${yearId}/categorise/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assignments: bulkEligible.map((g) => ({
+            transactionIds: g.lines.map((l) => l.id),
+            name: g.suggestion!.categoryName,
+            complianceCode: g.suggestion!.complianceCode,
+          })),
+        }),
+      });
+    } catch {
+      toast.error("Couldn't reach the server — check your connection and try again.");
+      return;
+    } finally {
+      setBulkBusy(false);
+    }
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       toast.error(body.error ?? "Couldn't apply the suggestions — please try again.");
@@ -134,11 +144,17 @@ export default function CategoriseQueue({
   }
 
   async function undo(g: DoneGroup) {
-    const res = await fetch(`/api/years/${yearId}/categorise`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sourceIds: g.sourceIds }),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`/api/years/${yearId}/categorise`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourceIds: g.sourceIds }),
+      });
+    } catch {
+      toast.error("Couldn't reach the server — check your connection and try again.");
+      return;
+    }
     if (!res.ok) {
       toast.error("Couldn't undo that — please try again.");
       return;
@@ -195,7 +211,11 @@ export default function CategoriseQueue({
                   </p>
                 </div>
               </div>
-              <Button onClick={acceptAll} loading={bulkBusy} className="shrink-0">
+              <Button
+                onClick={acceptAll}
+                loading={bulkBusy}
+                disabled={cardsBusy > 0}
+                className="shrink-0">
                 <Sparkles className="h-4 w-4" />
                 Accept {bulkEligible.length} suggestions
               </Button>
@@ -246,6 +266,8 @@ export default function CategoriseQueue({
                 group={g}
                 categories={categories}
                 complianceOptions={complianceOptions}
+                locked={bulkBusy}
+                onBusyChange={(b) => setCardsBusy((n) => (b ? n + 1 : Math.max(0, n - 1)))}
                 onDone={() => router.refresh()}
               />
             ))
@@ -333,8 +355,11 @@ function DoneList({
                   loading={busyKey === key}
                   onClick={async () => {
                     setBusyKey(key);
-                    await onUndo(g);
-                    setBusyKey(null);
+                    try {
+                      await onUndo(g);
+                    } finally {
+                      setBusyKey(null);
+                    }
                   }}>
                   <Undo2 className="h-3.5 w-3.5" /> Undo
                 </Button>
@@ -358,12 +383,16 @@ function GroupCard({
   group,
   categories,
   complianceOptions,
+  locked,
+  onBusyChange,
   onDone,
 }: {
   yearId: string;
   group: Group;
   categories: Category[];
   complianceOptions: ComplianceOption[];
+  locked: boolean;
+  onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
   const suggested = group.suggestion
@@ -388,20 +417,29 @@ function GroupCard({
   const isIn = group.totalCents >= 0;
 
   async function apply() {
-    if (!canApply) return;
+    if (!canApply || locked) return;
     setBusy(true);
-    const res = await fetch(`/api/years/${yearId}/categorise`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        transactionIds: group.lines.map((l) => l.id),
-        ...(choice === NEW
-          ? { newCategory: { name: newName.trim(), complianceCode: newCode } }
-          : { categoryId: choice }),
-        ...(needsFunder && funder.trim() ? { funderName: funder.trim() } : {}),
-      }),
-    });
-    setBusy(false);
+    onBusyChange(true);
+    let res: Response;
+    try {
+      res = await fetch(`/api/years/${yearId}/categorise`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactionIds: group.lines.map((l) => l.id),
+          ...(choice === NEW
+            ? { newCategory: { name: newName.trim(), complianceCode: newCode } }
+            : { categoryId: choice }),
+          ...(needsFunder && funder.trim() ? { funderName: funder.trim() } : {}),
+        }),
+      });
+    } catch {
+      toast.error("Couldn't reach the server — check your connection and try again.");
+      return;
+    } finally {
+      setBusy(false);
+      onBusyChange(false);
+    }
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       toast.error(body.error ?? "Couldn't save that — please try again.");
@@ -463,7 +501,12 @@ function GroupCard({
             ))}
             <option value={NEW}>＋ New category…</option>
           </select>
-          <Button onClick={apply} disabled={!canApply} loading={busy} size="sm" className="h-9 px-4">
+          <Button
+            onClick={apply}
+            disabled={!canApply || locked}
+            loading={busy}
+            size="sm"
+            className="h-9 px-4">
             Apply
           </Button>
         </div>
