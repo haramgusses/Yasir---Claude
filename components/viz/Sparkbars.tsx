@@ -40,7 +40,7 @@ export default function Sparkbars({ months }: { months: SparkMonth[] }) {
               onMouseLeave={() => setActive(null)}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              className="flex-1 cursor-default rounded-t-[2px] outline-none focus-visible:ring-1 focus-visible:ring-performa-teal"
+              className="flex-1 cursor-default rounded-t-[2px] outline-none focus-visible:ring-1 focus-visible:ring-performa-cyan"
               style={{
                 height: t === 0 ? 2 : `${Math.max(12, (t / max) * 100)}%`,
                 background: t === 0 ? VIZ.grid : net >= 0 ? VIZ.green : VIZ.plum,
@@ -53,7 +53,7 @@ export default function Sparkbars({ months }: { months: SparkMonth[] }) {
       {a && (
         <div
           className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-          style={{ background: VIZ.ink, color: "#fff" }}>
+          style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
           <span className="font-semibold">{a.full}</span> · {nzd(a.inCents)} in ·{" "}
           {nzd(a.outCents)} out
         </div>

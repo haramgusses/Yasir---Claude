@@ -183,12 +183,12 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
 
       {/* Tier explanation — a conclusion with reasons, not a question */}
       <Card className="p-5 print:hidden">
-        <div className="text-sm font-semibold text-slate-900">
+        <div className="text-sm font-semibold text-ink">
           Your report format:{" "}
           {tierResult.tier === "TIER_4" ? "Tier 4 — simple cash reporting" : "Tier 3 — accrual reporting"}
           {tierResult.optedUp ? " (chosen)" : ""}
         </div>
-        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-slate-600">
+        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-ink-soft">
           {tierResult.reasons.map((r) => (
             <li key={r}>{r}</li>
           ))}
@@ -198,24 +198,24 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
       {/* Readiness checklist */}
       <Card className="p-5 print:hidden">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-900">
+          <h2 className="text-sm font-semibold text-ink">
             {ready ? "Ready to print your draft" : "Before your report is ready"}
           </h2>
           <PrintButton disabled={!ready} />
         </div>
         <ul className="mt-3 space-y-2">
           {blockers.map((m) => (
-            <li key={m} className="flex items-start gap-2 text-sm text-red-700">
+            <li key={m} className="flex items-start gap-2 text-sm text-red-300">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {m}
             </li>
           ))}
           {warnings.map((m) => (
-            <li key={m} className="flex items-start gap-2 text-sm text-amber-700">
+            <li key={m} className="flex items-start gap-2 text-sm text-amber-300">
               <Info className="mt-0.5 h-4 w-4 shrink-0" /> {m}
             </li>
           ))}
           {ready && warnings.length === 0 && (
-            <li className="flex items-start gap-2 text-sm text-emerald-700">
+            <li className="flex items-start gap-2 text-sm text-emerald-300">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> All checks pass. This draft
               still needs your committee&apos;s approval and signatures before filing.
             </li>
@@ -223,8 +223,8 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
         </ul>
       </Card>
 
-      {/* Statement preview */}
-      <Card className="p-8 print:border-0 print:shadow-none">
+      {/* Statement preview — rendered as physical paper on the dark UI */}
+      <div className="paper rounded-2xl p-8 shadow-lift print:rounded-none print:p-0 print:shadow-none">
         <div className="text-center">
           <h1 className="text-xl font-semibold text-slate-900">{year.org.name}</h1>
           <p className="mt-1 text-sm text-slate-600">
@@ -297,7 +297,7 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
           (entity information, statement of service performance, financial position and
           notes) is assembled at export — coming in the next build stage.
         </p>
-      </Card>
+      </div>
     </div>
   );
 }
@@ -315,18 +315,18 @@ function StatCard({
 }) {
   const ring =
     tone === "in"
-      ? "text-emerald-600 bg-emerald-50"
+      ? "text-emerald-400 bg-emerald-400/10"
       : tone === "out"
-        ? "text-slate-600 bg-slate-100"
-        : "text-performa-navy bg-performa-teal/10";
+        ? "text-ink-soft bg-white/[0.06]"
+        : "text-performa-cyan bg-performa-cyan/10";
   return (
     <Card className="flex items-center gap-3 p-4">
       <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${ring}`}>
         <Icon className="h-5 w-5" />
       </span>
       <div>
-        <div className="text-[11px] uppercase tracking-wide text-slate-400">{label}</div>
-        <div className="text-lg font-semibold tabular-nums text-slate-900">{value}</div>
+        <div className="text-[11px] uppercase tracking-wide text-ink-mute">{label}</div>
+        <div className="text-lg font-semibold tabular-nums text-ink">{value}</div>
       </div>
     </Card>
   );

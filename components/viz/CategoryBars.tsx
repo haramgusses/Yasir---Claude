@@ -41,7 +41,7 @@ export default function CategoryBars({
             <div
               key={r.label}
               tabIndex={0}
-              className="group relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-performa-teal"
+              className="group relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-performa-cyan"
               onMouseEnter={() => setActive(i)}
               onMouseLeave={() => setActive(null)}
               onFocus={() => setActive(i)}
@@ -70,7 +70,7 @@ export default function CategoryBars({
               {isActive && (
                 <div
                   className="pointer-events-none absolute right-0 top-full z-10 mt-1 rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-                  style={{ background: VIZ.ink, color: "#fff" }}>
+                  style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
                   {pct}% of {title.toLowerCase()}
                 </div>
               )}

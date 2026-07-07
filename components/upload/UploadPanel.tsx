@@ -109,8 +109,8 @@ export default function UploadPanel({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Upload your bank statements</h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <h2 className="text-lg font-semibold text-ink">Upload your bank statements</h2>
+        <p className="mt-1 text-sm text-ink-soft">
           Export each account&apos;s transactions as CSV from internet banking for the
           full year ({yearStart} to {yearEnd}) and drop them in. We check everything adds
           up before you categorise anything.
@@ -128,8 +128,8 @@ export default function UploadPanel({
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-performa-teal/10">
             <Building2 className="h-6 w-6 text-performa-teal" />
           </div>
-          <p className="mt-3 text-sm font-medium text-slate-900">Start by adding a bank account</p>
-          <p className="mx-auto mt-1 max-w-md text-xs text-slate-500">
+          <p className="mt-3 text-sm font-medium text-ink">Start by adding a bank account</p>
+          <p className="mx-auto mt-1 max-w-md text-xs text-ink-mute">
             In your internet banking, open your transaction history and choose
             &ldquo;Export&rdquo; or &ldquo;Download&rdquo; as CSV. ANZ, ASB, BNZ, Westpac
             and Kiwibank formats are recognised automatically.
@@ -141,10 +141,10 @@ export default function UploadPanel({
         <Card key={a.id} className="p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100">
-                <Building2 className="h-5 w-5 text-slate-500" />
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.06]">
+                <Building2 className="h-5 w-5 text-ink-mute" />
               </span>
-              <div className="font-medium text-slate-900">{a.name}</div>
+              <div className="font-medium text-ink">{a.name}</div>
             </div>
           </div>
 
@@ -164,13 +164,13 @@ export default function UploadPanel({
               "mt-4 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed py-6 text-center transition-colors",
               dragOver === a.id
                 ? "border-performa-teal bg-performa-teal/5"
-                : "border-slate-200 hover:border-performa-teal/60 hover:bg-slate-50"
+                : "border-line hover:border-performa-teal/60 hover:bg-white/[0.06]"
             )}>
             <FileSpreadsheet className="h-6 w-6 text-performa-teal" />
-            <span className="text-sm font-medium text-slate-700">
+            <span className="text-sm font-medium text-ink-soft">
               {busy === a.id ? "Reading your file…" : "Drop a CSV here, or click to choose"}
             </span>
-            <span className="text-xs text-slate-400">Exported from your internet banking</span>
+            <span className="text-xs text-ink-mute">Exported from your internet banking</span>
             <input
               type="file"
               accept=".csv,text/csv"
@@ -185,12 +185,12 @@ export default function UploadPanel({
           </label>
 
           {a.batches.length > 0 && (
-            <ul className="mt-4 divide-y divide-slate-100">
+            <ul className="mt-4 divide-y divide-line">
               {a.batches.map((b) => (
                 <li key={b.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                   <div className="min-w-0">
-                    <span className="truncate text-slate-800">{b.fileName}</span>
-                    <div className="text-xs text-slate-500">
+                    <span className="truncate text-ink">{b.fileName}</span>
+                    <div className="text-xs text-ink-mute">
                       {b.lines} transactions
                       {b.periodStart ? ` · ${b.periodStart} → ${b.periodEnd}` : ""}
                       {b.openingBalanceCents !== null
@@ -211,7 +211,7 @@ export default function UploadPanel({
           )}
 
           {a.batches.length === 0 && accounts.some((x) => x.batches.length > 0) && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 No statements uploaded for this account yet — if it had any activity
@@ -221,7 +221,7 @@ export default function UploadPanel({
           )}
 
           {a.batches.length > 0 && a.gaps.length > 0 && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
               <CalendarClock className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 Missing period{a.gaps.length > 1 ? "s" : ""}:{" "}
@@ -235,7 +235,7 @@ export default function UploadPanel({
 
       <form onSubmit={addAccount} className="flex gap-2">
         <input
-          className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-teal"
+          className="flex-1 rounded-lg border border-line-strong bg-white/[0.05] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-cyan"
           placeholder='Add another account, e.g. "Everyday account" or "Savings"'
           value={newAccount}
           onChange={(e) => setNewAccount(e.target.value)}
@@ -250,10 +250,10 @@ export default function UploadPanel({
           <div className="flex items-center gap-3">
             <CheckCircle2 className="h-5 w-5 shrink-0 text-performa-teal" />
             <div>
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-ink">
                 All statements verified — everything adds up
               </p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-ink-soft">
                 Got more accounts? Add them above. Otherwise you&apos;re ready to sort
                 your transactions.
               </p>
@@ -261,7 +261,7 @@ export default function UploadPanel({
           </div>
           <Link
             href={`/dashboard/${yearId}/categorise`}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-navy">
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-cyan hover:text-[#04262b]">
             Continue to categorise <ChevronRight className="h-4 w-4" />
           </Link>
         </Card>
@@ -329,7 +329,7 @@ function BalanceForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 hover:bg-amber-200">
+        className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-medium text-amber-300 hover:bg-amber-400/25">
         <AlertTriangle className="h-3.5 w-3.5" /> Enter balances
       </button>
     );
@@ -343,7 +343,7 @@ function BalanceForm({
         placeholder="Opening $"
         value={opening}
         onChange={(e) => setOpening(e.target.value)}
-        className="w-24 rounded border border-slate-300 bg-white px-2 py-1 text-xs"
+        className="w-24 rounded border border-line-strong bg-white/[0.05] px-2 py-1 text-xs"
       />
       <input
         required
@@ -352,7 +352,7 @@ function BalanceForm({
         placeholder="Closing $"
         value={closing}
         onChange={(e) => setClosing(e.target.value)}
-        className="w-24 rounded border border-slate-300 bg-white px-2 py-1 text-xs"
+        className="w-24 rounded border border-line-strong bg-white/[0.05] px-2 py-1 text-xs"
       />
       <Button type="submit" size="sm" loading={busy}>
         Check

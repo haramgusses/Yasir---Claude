@@ -21,7 +21,7 @@ export default async function YearLayout({
     <div className="animate-fade-in">
       <Link
         href="/dashboard"
-        className="mb-3 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-performa-navy print:hidden">
+        className="mb-3 inline-flex items-center gap-1 text-xs text-ink-mute hover:text-performa-cyan print:hidden">
         <ChevronLeft className="h-3.5 w-3.5" />
         {year.org.name} · year ended {year.endDate.toISOString().slice(0, 10)}
       </Link>
@@ -33,13 +33,13 @@ export default async function YearLayout({
       />
 
       {p.total > 0 && (
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between print:hidden">
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-line bg-white/[0.05] px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between print:hidden">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between text-xs text-slate-500">
+            <div className="flex items-center justify-between text-xs text-ink-mute">
               <span>
                 {p.categorised} of {p.total} transactions categorised
               </span>
-              <span className="font-medium text-performa-navy">{p.pct}%</span>
+              <span className="font-medium text-performa-cyan">{p.pct}%</span>
             </div>
             <ProgressBar value={p.pct} className="mt-1.5" />
           </div>
@@ -63,14 +63,14 @@ export default async function YearLayout({
 function Stat({ label, value, tone }: { label: string; value: string; tone: "in" | "out" | "net" }) {
   return (
     <div className="text-right">
-      <div className="text-[11px] uppercase tracking-wide text-slate-400">{label}</div>
+      <div className="text-[11px] uppercase tracking-wide text-ink-mute">{label}</div>
       <div
         className={
           tone === "in"
-            ? "font-semibold tabular-nums text-emerald-600"
+            ? "font-semibold tabular-nums text-emerald-400"
             : tone === "out"
-              ? "font-semibold tabular-nums text-slate-700"
-              : "font-semibold tabular-nums text-performa-navy"
+              ? "font-semibold tabular-nums text-ink-soft"
+              : "font-semibold tabular-nums text-performa-cyan"
         }>
         {value}
       </div>

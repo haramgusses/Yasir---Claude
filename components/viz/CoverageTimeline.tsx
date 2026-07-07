@@ -28,8 +28,8 @@ export default function CoverageTimeline({ accounts }: { accounts: AccountCovera
           </span>
           <span className="inline-flex items-center gap-1.5">
             <svg width="10" height="10" className="rounded-sm" aria-hidden="true">
-              <rect width="10" height="10" fill="#fef3c7" />
-              <path d="M-2 4 L4 -2 M0 12 L12 0 M6 14 L14 6" stroke="#b45309" strokeWidth="1.4" />
+              <rect width="10" height="10" fill="rgba(251,191,36,0.16)" />
+              <path d="M-2 4 L4 -2 M0 12 L12 0 M6 14 L14 6" stroke="#f59e0b" strokeWidth="1.4" />
             </svg>
             Missing
           </span>
@@ -55,19 +55,19 @@ export default function CoverageTimeline({ accounts }: { accounts: AccountCovera
                     onMouseLeave={() => setTip(null)}
                     onFocus={() => setTip(key)}
                     onBlur={() => setTip(null)}
-                    className="relative flex-1 cursor-default rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-performa-teal"
+                    className="relative flex-1 cursor-default rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-performa-cyan"
                     style={
                       m.covered
                         ? { background: VIZ.green }
                         : {
                             background:
-                              "repeating-linear-gradient(45deg, #fef3c7, #fef3c7 3px, #f6c453 3px, #f6c453 5px)",
+                              "repeating-linear-gradient(45deg, rgba(251,191,36,0.10), rgba(251,191,36,0.10) 3px, rgba(245,158,11,0.55) 3px, rgba(245,158,11,0.55) 5px)",
                           }
                     }>
                     {tip === key && (
                       <span
                         className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-                        style={{ background: VIZ.ink, color: "#fff" }}>
+                        style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
                         {m.full} — {m.covered ? "covered" : "missing"}
                       </span>
                     )}

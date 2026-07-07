@@ -10,13 +10,13 @@ export function ProgressBar({
   const pct = Math.min(100, Math.max(0, value));
   return (
     <div
-      className={cn("h-2 w-full overflow-hidden rounded-full bg-slate-100", className)}
+      className={cn("h-2 w-full overflow-hidden rounded-full bg-white/[0.08]", className)}
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}>
       <div
-        className="h-full rounded-full bg-brand-gradient transition-all duration-500 ease-out"
+        className="h-full rounded-full bg-brand-gradient shadow-[0_0_12px_rgba(48,207,195,0.5)] transition-all duration-500 ease-out motion-reduce:transition-none"
         style={{ width: `${pct}%` }}
       />
     </div>

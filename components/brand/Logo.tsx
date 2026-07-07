@@ -60,12 +60,12 @@ export function Logo({
         <div
           className={cn(
             "font-bold tracking-tight text-lg",
-            light ? "text-white" : "text-performa-navy"
+            light ? "text-white" : "text-ink"
           )}>
           Performa
         </div>
         {tagline ? (
-          <div className={cn("text-xs", light ? "text-white/60" : "text-slate-500")}>
+          <div className={cn("text-xs", light ? "text-white/60" : "text-ink-mute")}>
             {tagline}
           </div>
         ) : null}

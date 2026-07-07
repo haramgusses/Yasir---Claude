@@ -43,8 +43,8 @@ export default async function DashboardPage() {
     <div className="animate-fade-in space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{org.name}</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <h1 className="text-2xl font-semibold text-ink">{org.name}</h1>
+          <p className="mt-1 text-sm text-ink-soft">
             Pick a financial year to keep working on its performance report.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
               <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-base font-semibold text-slate-900">
+                    <h2 className="text-base font-semibold text-ink">
                       Year ended {year.endDate.toISOString().slice(0, 10)}
                     </h2>
                     <Badge tone={status.tone}>{status.label}</Badge>
@@ -77,12 +77,12 @@ export default async function DashboardPage() {
                     )}
                   </div>
                   {p.total > 0 ? (
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-ink-mute">
                       {p.total} transactions · {nzd(p.inCents, { whole: true })} in ·{" "}
                       {nzd(p.outCents, { whole: true })} out
                     </p>
                   ) : (
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-ink-mute">
                       Upload a bank statement to get started.
                     </p>
                   )}
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
 
                 <Link
                   href={`/dashboard/${year.id}/${p.nextStep}`}
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-performa-navy">
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-performa-cyan hover:text-[#04262b]">
                   <NextIcon className="h-4 w-4" />
                   {next.label}
                   <ArrowRight className="h-4 w-4" />
@@ -98,13 +98,13 @@ export default async function DashboardPage() {
               </div>
 
               {p.total > 0 && (
-                <div className="flex items-end gap-6 border-t border-slate-100 bg-slate-50/60 px-5 py-3">
+                <div className="flex items-end gap-6 border-t border-line bg-white/[0.03] px-5 py-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className="flex items-center justify-between text-xs text-ink-mute">
                       <span>
                         {p.categorised} of {p.total} categorised
                       </span>
-                      <span className="font-medium text-performa-navy">{p.pct}%</span>
+                      <span className="font-medium text-performa-cyan">{p.pct}%</span>
                     </div>
                     <ProgressBar value={p.pct} className="mt-1.5" />
                   </div>

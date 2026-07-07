@@ -19,8 +19,8 @@ const config: Config = {
         mono: ["var(--font-mono)", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06)",
-        lift: "0 10px 30px -12px rgba(17, 42, 97, 0.18)",
+        card: "0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -12px rgba(2,6,23,0.8)",
+        lift: "0 24px 48px -16px rgba(2,6,23,0.9)",
       },
       colors: {
         // Performa brand palette
@@ -30,6 +30,21 @@ const config: Config = {
           cyan: "#30CFC3",
           onyx: "#262626",
         },
+        // Dark fintech surface & ink tokens
+        ink: {
+          DEFAULT: "#e8ecf8",
+          soft: "#aab3d0",
+          mute: "#7c86a8",
+        },
+        line: {
+          DEFAULT: "rgba(225,229,242,0.09)",
+          strong: "rgba(225,229,242,0.18)",
+        },
+        surface: {
+          DEFAULT: "rgba(18,27,58,0.62)",
+          2: "rgba(225,229,242,0.06)",
+        },
+        abyss: "#070d1f",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

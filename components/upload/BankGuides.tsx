@@ -53,21 +53,21 @@ const GUIDES: { bank: string; steps: string[] }[] = [
 
 export default function BankGuides() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-sm font-medium text-slate-900">
+    <div className="rounded-xl border border-line bg-white/[0.05] p-4">
+      <p className="text-sm font-medium text-ink">
         How do I get a CSV from my bank?
       </p>
-      <p className="mt-0.5 text-xs text-slate-500">
+      <p className="mt-0.5 text-xs text-ink-mute">
         Every NZ bank can export your transactions as a CSV file. Pick your bank:
       </p>
-      <div className="mt-2 divide-y divide-slate-100">
+      <div className="mt-2 divide-y divide-line">
         {GUIDES.map((g) => (
           <details key={g.bank} className="group py-1.5">
-            <summary className="flex cursor-pointer list-none items-center justify-between py-1 text-sm text-slate-700 hover:text-performa-navy [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between py-1 text-sm text-ink-soft hover:text-performa-cyan [&::-webkit-details-marker]:hidden">
               {g.bank}
-              <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
+              <ChevronDown className="h-4 w-4 text-ink-mute transition-transform group-open:rotate-180" />
             </summary>
-            <ol className="mb-2 ml-4 list-decimal space-y-1 text-xs text-slate-600">
+            <ol className="mb-2 ml-4 list-decimal space-y-1 text-xs text-ink-soft">
               {g.steps.map((s) => (
                 <li key={s}>{s}</li>
               ))}

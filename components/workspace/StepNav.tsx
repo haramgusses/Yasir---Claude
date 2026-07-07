@@ -44,7 +44,7 @@ export default function StepNav({
               href={href}
               className={cn(
                 "group flex flex-1 items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
-                active ? "bg-white shadow-card" : "hover:bg-white/60"
+                active ? "bg-white/[0.05] shadow-card" : "hover:bg-white/[0.06]"
               )}>
               <span
                 className={cn(
@@ -53,7 +53,7 @@ export default function StepNav({
                     ? "bg-performa-teal text-white"
                     : active
                       ? "bg-performa-navy text-white"
-                      : "bg-slate-200 text-slate-500 group-hover:bg-slate-300"
+                      : "bg-white/[0.10] text-ink-mute group-hover:bg-white/[0.16]"
                 )}>
                 {isDone ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
               </span>
@@ -61,20 +61,20 @@ export default function StepNav({
                 <span
                   className={cn(
                     "flex items-center gap-1.5 text-sm font-medium",
-                    active ? "text-performa-navy" : "text-slate-700"
+                    active ? "text-performa-cyan" : "text-ink-soft"
                   )}>
                   {s.label}
                   {badge ? (
-                    <span className="rounded-full bg-amber-100 px-1.5 text-xs font-semibold text-amber-800">
+                    <span className="rounded-full bg-amber-400/15 px-1.5 text-xs font-semibold text-amber-300">
                       {badge}
                     </span>
                   ) : null}
                 </span>
-                <span className="hidden text-xs text-slate-500 sm:block">{s.hint}</span>
+                <span className="hidden text-xs text-ink-mute sm:block">{s.hint}</span>
               </span>
             </Link>
             {i < STEPS.length - 1 && (
-              <div className="mx-1 hidden h-px w-6 shrink-0 bg-slate-200 sm:block" />
+              <div className="mx-1 hidden h-px w-6 shrink-0 bg-white/[0.10] sm:block" />
             )}
           </div>
         );

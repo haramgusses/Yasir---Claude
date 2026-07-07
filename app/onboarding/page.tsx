@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Logo } from "@/components/brand/Logo";
+import Background from "@/components/fx/Background";
 import { Button } from "@/components/ui/Button";
 
 // Setup asks only for facts the data can't tell us (PLAN §3.5, §7):
@@ -21,8 +22,8 @@ const PACKS = [
 ];
 
 const inputCls =
-  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-teal bg-white";
-const labelCls = "block text-sm font-medium text-slate-700 mb-1";
+  "w-full rounded-lg border border-line-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-cyan bg-white/[0.05]";
+const labelCls = "block text-sm font-medium text-ink-soft mb-1";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -57,19 +58,20 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="h-1 bg-brand-gradient" />
-      <div className="mx-auto max-w-xl px-4 py-12">
+    <div className="relative min-h-screen">
+      <Background />
+      <div className="relative z-10 h-px bg-gradient-to-r from-transparent via-performa-cyan/60 to-transparent" />
+      <div className="relative z-10 mx-auto max-w-xl px-4 py-12">
         <Logo className="mb-8" />
-        <h1 className="text-2xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-semibold text-ink">
           Tell us about your organisation
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-ink-soft">
           Two minutes of setup — then upload a bank statement and we&apos;ll guide
           you the rest of the way. We work out the right report format for you.
         </p>
 
-        <form onSubmit={submit} className="mt-8 space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+        <form onSubmit={submit} className="mt-8 space-y-6 glass rounded-2xl p-6 shadow-card">
           <div>
             <label className={labelCls} htmlFor="name">Organisation name</label>
             <input id="name" required className={inputCls} value={form.name}
@@ -86,7 +88,7 @@ export default function OnboardingPage() {
               <option value="INCORPORATED_SOCIETY">Incorporated society (not a charity)</option>
               <option value="OTHER">Other / not sure</option>
             </select>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-ink-mute">
               Not sure? Check the charities register or the incorporated societies
               register — and note that societies that didn&apos;t reregister by
               5 April 2026 may no longer be incorporated.
@@ -123,7 +125,7 @@ export default function OnboardingPage() {
                 <option key={p.key} value={p.key}>{p.label}</option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-ink-mute">
               This just gives you a sensible starting set of categories — you can
               rename or add your own later.
             </p>
@@ -140,7 +142,7 @@ export default function OnboardingPage() {
                 ["FIRST_YEAR", "This is our first year"],
                 ["UNSURE", "Not sure"],
               ].map(([v, label]) => (
-                <label key={v} className="flex items-center gap-2 text-sm text-slate-700">
+                <label key={v} className="flex items-center gap-2 text-sm text-ink-soft">
                   <input type="radio" name="band" checked={form.priorSpendBand === v}
                     onChange={() => {
                       set("priorSpendBand", v);
@@ -151,10 +153,10 @@ export default function OnboardingPage() {
               ))}
             </div>
             <details className="mt-2">
-              <summary className="cursor-pointer text-xs text-slate-500 underline decoration-dotted">
+              <summary className="cursor-pointer text-xs text-ink-mute underline decoration-dotted">
                 Why do we ask?
               </summary>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-ink-mute">
                 The law sets the report format by your spending over the last two
                 years: under $140,000 a year means a simple cash-based report
                 (Tier 4); over means a fuller one (Tier 3). A rough answer is fine —
@@ -164,7 +166,7 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <label className="flex items-start gap-2 text-sm text-slate-700">
+            <label className="flex items-start gap-2 text-sm text-ink-soft">
               <input type="checkbox" className="mt-0.5" checked={form.publicAccountability}
                 onChange={(e) => set("publicAccountability", e.target.checked)} />
               <span>
@@ -173,10 +175,10 @@ export default function OnboardingPage() {
               </span>
             </label>
             <details className="mt-2">
-              <summary className="cursor-pointer text-xs text-slate-500 underline decoration-dotted">
+              <summary className="cursor-pointer text-xs text-ink-mute underline decoration-dotted">
                 Why do we ask?
               </summary>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-ink-mute">
                 Organisations that hold others&apos; money in trust have stricter
                 reporting rules. Almost all community groups can leave this unticked —
                 receiving grants and donations for your own work doesn&apos;t count.
