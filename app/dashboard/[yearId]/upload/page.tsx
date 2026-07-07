@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireYear, isoDate } from "@/lib/years";
+import { requireYear, isoDate, monthBuckets } from "@/lib/years";
 import { coverageGaps } from "@/lib/import/verify";
 import UploadPanel from "@/components/upload/UploadPanel";
+import type { AccountCoverage } from "@/components/viz/CoverageTimeline";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,31 @@ export default async function UploadPage({ params }: { params: { yearId: string 
     ),
   }));
 
+  // A month counts as covered when any uploaded statement period touches it.
+  function buildCoverage(): AccountCoverage[] {
+    const buckets = monthBuckets(year!.startDate, year!.endDate);
+    return accounts
+      .filter((a) => a.imports.length > 0)
+      .map((a) => ({
+        name: a.name,
+        months: buckets.map((b) => ({
+          label: b.label,
+          full: b.full,
+          covered: a.imports.some(
+            (imp) =>
+              imp.periodStart && imp.periodEnd && imp.periodStart <= b.end && imp.periodEnd >= b.start
+          ),
+        })),
+      }));
+  }
+
   return (
     <UploadPanel
       yearId={year.id}
       yearStart={yearStart}
       yearEnd={yearEnd}
       accounts={data}
+      coverage={buildCoverage()}
       canContinue={
         data.length > 0 &&
         // Every account needs at least one verified statement — an account

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { ArrowDownLeft, ArrowUpRight, Scale, CheckCircle2, AlertCircle, Info } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { requireYear, isoDate } from "@/lib/years";
+import { requireYear, isoDate, monthlyFlow } from "@/lib/years";
+import MonthlyFlow from "@/components/viz/MonthlyFlow";
+import CategoryBars from "@/components/viz/CategoryBars";
 import { coverageGaps } from "@/lib/import/verify";
 import { detectTier, type PriorSpendBand } from "@/lib/compliance/tierDetection";
 import { equivalentCode } from "@/lib/compliance/starterPacks";
@@ -139,6 +141,21 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
   const inTotal = model.sections[0]?.totalCents ?? 0;
   const outTotal = model.sections[1]?.totalCents ?? 0;
 
+  // Chart data: monthly cash flow + per-category magnitudes (already
+  // presented as positive magnitudes by the statement model).
+  const months = (await monthlyFlow(year.id, year.startDate, year.endDate)).map((b) => ({
+    label: b.label,
+    full: b.full,
+    inCents: b.inCents,
+    outCents: b.outCents,
+  }));
+  const revenueRows = (model.sections[0]?.rows ?? [])
+    .map((r) => ({ label: r.label, cents: r.amountCents }))
+    .sort((a, b) => b.cents - a.cents);
+  const expenseRows = (model.sections[1]?.rows ?? [])
+    .map((r) => ({ label: r.label, cents: r.amountCents }))
+    .sort((a, b) => b.cents - a.cents);
+
   return (
     <div className="space-y-6">
       {/* Summary stat cards */}
@@ -152,6 +169,17 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
           tone="net"
         />
       </div>
+
+      {/* Year at a glance — interactive, screen-only */}
+      {months.some((m) => m.inCents + m.outCents > 0) && (
+        <Card className="space-y-8 p-5 print:hidden">
+          <MonthlyFlow months={months} />
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <CategoryBars title="Where money came from" rows={revenueRows} hue="green" />
+            <CategoryBars title="Where money went" rows={expenseRows} hue="plum" />
+          </div>
+        </Card>
+      )}
 
       {/* Tier explanation — a conclusion with reasons, not a question */}
       <Card className="p-5 print:hidden">

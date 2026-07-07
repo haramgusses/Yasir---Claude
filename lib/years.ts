@@ -41,6 +41,55 @@ const reportableWhere = (yearId: string): Prisma.SourceTransactionWhereInput => 
 
 export type WorkflowStep = "upload" | "categorise" | "review";
 
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+export interface MonthBucket {
+  label: string; // "Apr"
+  full: string; // "April 2025"
+  start: Date;
+  end: Date; // last day of the month (UTC)
+  inCents: number;
+  outCents: number;
+}
+
+/** The financial year's months, as empty buckets. */
+export function monthBuckets(startDate: Date, endDate: Date): MonthBucket[] {
+  const buckets: MonthBucket[] = [];
+  const d = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1));
+  while (d <= endDate && buckets.length < 13) {
+    const monthEnd = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
+    buckets.push({
+      label: MONTH_SHORT[d.getUTCMonth()],
+      full: `${MONTH_FULL[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+      start: new Date(d),
+      end: monthEnd,
+      inCents: 0,
+      outCents: 0,
+    });
+    d.setUTCMonth(d.getUTCMonth() + 1);
+  }
+  return buckets;
+}
+
+/** Money in / money out per month of the year, from reportable transactions. */
+export async function monthlyFlow(yearId: string, startDate: Date, endDate: Date) {
+  const buckets = monthBuckets(startDate, endDate);
+  const lines = await prisma.sourceTransaction.findMany({
+    where: reportableWhere(yearId),
+    select: { date: true, amountCents: true },
+  });
+  const base = startDate.getUTCFullYear() * 12 + startDate.getUTCMonth();
+  for (const l of lines) {
+    const i = l.date.getUTCFullYear() * 12 + l.date.getUTCMonth() - base;
+    const b = buckets[i];
+    if (!b) continue;
+    if (l.amountCents >= 0) b.inCents += l.amountCents;
+    else b.outCents -= l.amountCents;
+  }
+  return buckets;
+}
+
 /**
  * Live progress + running totals for a financial year. Drives the dashboard
  * cards, the step journey, and the summary strip.

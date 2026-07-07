@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BankGuides from "@/components/upload/BankGuides";
+import CoverageTimeline, { type AccountCoverage } from "@/components/viz/CoverageTimeline";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -42,12 +43,14 @@ export default function UploadPanel({
   yearStart,
   yearEnd,
   accounts,
+  coverage,
   canContinue,
 }: {
   yearId: string;
   yearStart: string;
   yearEnd: string;
   accounts: Account[];
+  coverage: AccountCoverage[];
   canContinue: boolean;
 }) {
   const router = useRouter();
@@ -113,6 +116,12 @@ export default function UploadPanel({
           up before you categorise anything.
         </p>
       </div>
+
+      {coverage.length > 0 && (
+        <Card className="p-5">
+          <CoverageTimeline accounts={coverage} />
+        </Card>
+      )}
 
       {accounts.length === 0 && (
         <Card className="border-dashed p-8 text-center">

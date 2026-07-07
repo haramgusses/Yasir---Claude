@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Upload, ListChecks, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { yearProgress, type WorkflowStep } from "@/lib/years";
+import { yearProgress, monthlyFlow, type WorkflowStep } from "@/lib/years";
+import Sparkbars from "@/components/viz/Sparkbars";
 import { nzd } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -27,7 +28,15 @@ export default async function DashboardPage() {
   if (!org) redirect("/onboarding");
 
   const years = await Promise.all(
-    org.years.map(async (y) => ({ year: y, progress: await yearProgress(y.id) }))
+    org.years.map(async (y) => ({
+      year: y,
+      progress: await yearProgress(y.id),
+      months: (await monthlyFlow(y.id, y.startDate, y.endDate)).map((b) => ({
+        full: b.full,
+        inCents: b.inCents,
+        outCents: b.outCents,
+      })),
+    }))
   );
 
   return (
@@ -43,7 +52,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="space-y-4">
-        {years.map(({ year, progress: p }) => {
+        {years.map(({ year, progress: p, months }) => {
           const next = NEXT[p.nextStep];
           const NextIcon = next.icon;
           const status = !p.started
@@ -89,14 +98,19 @@ export default async function DashboardPage() {
               </div>
 
               {p.total > 0 && (
-                <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>
-                      {p.categorised} of {p.total} categorised
-                    </span>
-                    <span className="font-medium text-performa-navy">{p.pct}%</span>
+                <div className="flex items-end gap-6 border-t border-slate-100 bg-slate-50/60 px-5 py-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>
+                        {p.categorised} of {p.total} categorised
+                      </span>
+                      <span className="font-medium text-performa-navy">{p.pct}%</span>
+                    </div>
+                    <ProgressBar value={p.pct} className="mt-1.5" />
                   </div>
-                  <ProgressBar value={p.pct} className="mt-1.5" />
+                  <div className="hidden w-44 shrink-0 sm:block">
+                    <Sparkbars months={months} />
+                  </div>
                 </div>
               )}
             </Card>
