@@ -1,19 +1,21 @@
 import { SignUp } from "@clerk/nextjs";
+import { Logo } from "@/components/brand/Logo";
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-app-black">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-burgundy rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SQ</span>
-            </div>
-            <span className="text-white font-bold text-xl">ShipQR</span>
-          </div>
-          <p className="text-silver text-sm">Logistics Document Platform</p>
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="flex flex-col items-center mb-8">
+          <Logo light tagline="Financial statements for community organisations" />
         </div>
-        <SignUp />
+        <SignUp
+          appearance={{
+            variables: {
+              colorPrimary: "#1f7a5c",
+              borderRadius: "0.625rem",
+            },
+          }}
+        />
       </div>
     </div>
   );

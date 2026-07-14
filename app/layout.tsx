@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Public_Sans, Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const jetbrainsMono = JetBrains_Mono({
+const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["600", "700"],
+});
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "ShipQR — Logistics Document Platform",
-  description: "Generate QR-linked shipping documents for instant field access",
+  title: "Performa — financial statements from your bank statement",
+  description:
+    "Guided preparation of compliant Tier 3 and Tier 4 performance reports for NZ community organisations",
 };
 
 export default function RootLayout({
@@ -23,10 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className="dark">
-        <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <html lang="en">
+        <body
+          className={`${publicSans.variable} ${sourceSerif.variable} ${plexMono.variable} font-sans antialiased`}>
           {children}
-          <Toaster richColors theme="dark" position="top-right" />
+          <Toaster richColors position="top-right" />
         </body>
       </html>
     </ClerkProvider>

@@ -1,81 +1,61 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
   ],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: { "2xl": "1400px" },
-    },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
+      boxShadow: {
+        card: "0 1px 2px rgba(20,48,43,0.04), 0 4px 16px rgba(20,48,43,0.05)",
+        lift: "0 8px 40px rgba(20,48,43,0.12)",
+      },
       colors: {
-        burgundy: "#BA0C2F",
-        "app-yellow": "#FFCD00",
-        navy: "#172A3A",
-        "app-black": "#00100B",
-        silver: "#C9C9C9",
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+        // Performa brand — light, warm, forest-green (from the approved mock)
+        performa: {
+          brand: "#4bb943", // fresh green wordmark
+          forest: "#06280f", // sidebar / brand ink
+          green: "#1f7a5c", // primary action green
+          soft: "#e6f2ec", // green-tinted surface
+          // legacy keys kept so older class references stay sensible
+          navy: "#14302b",
+          teal: "#1f7a5c",
+          cyan: "#1f7a5c",
+          onyx: "#06280f",
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+        ink: {
+          DEFAULT: "#14302b",
+          soft: "#3a5650",
+          mute: "#6b827c",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        line: {
+          DEFAULT: "#e0e4df",
+          strong: "#cdd4cd",
         },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+        surface: {
+          DEFAULT: "#ffffff",
+          2: "#fbfcfa",
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
+        paper: "#f3f4f1",
+        clay: { DEFAULT: "#a8412b", soft: "#f6e4df" },
+        amberink: { DEFAULT: "#9a6a16", soft: "#f6edda" },
+        abyss: "#f3f4f1",
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        DEFAULT: "10px",
+        lg: "10px",
+        xl: "12px",
+        "2xl": "14px",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 };
-
 export default config;

@@ -7,46 +7,271 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Order {
-  id           String     @id @default(cuid())
-  token        String     @unique @default(cuid())
-  orderRef     String
-  recipient    String
-  shipmentType String
-  notes        String?
-  expiresAt    DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  createdBy    String
-  docs         Document[]
-  scans        Scan[]
+// ---------------------------------------------------------------------------
+// Domain: NZ nonprofit financial statement preparation (see docs/PLAN.md)
+// Core invariants:
+//  - SourceTransaction rows are immutable once imported (dedupe via lineHash).
+//  - Every source dollar is allocated to exactly one TransactionSplit.
+//  - Every Layer-2 Category maps to exactly one Layer-1 compliance category
+//    (code constant, see lib/compliance/categories.ts).
+//  - JournalEntry is append-only; corrections are reversing entries.
+// ---------------------------------------------------------------------------
 
-  @@index([createdBy])
-  @@index([token])
+enum EntityKind {
+  CHARITABLE_TRUST
+  INCORPORATED_SOCIETY
+  SOCIETY_AND_CHARITY
+  OTHER
 }
 
-model Document {
-  id         String   @id @default(cuid())
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+enum ReportingTier {
+  TIER_3
+  TIER_4
+}
+
+enum YearStatus {
+  IN_PROGRESS
+  FINALISED
+}
+
+enum ImportSource {
+  CSV
+  XLSX
+  PDF_TEXT
+  MANUAL
+}
+
+enum GstStatus {
+  REGISTERED
+  NOT_REGISTERED
+  UNSURE
+}
+
+model Organisation {
+  id               String          @id @default(cuid())
+  name             String
+  clerkUserId      String // owner; multi-user is post-v0.1
+  entityKind       EntityKind      @default(OTHER)
+  charityNumber    String?
+  nzbn             String?
+  balanceDateMonth Int // 1-12
+  balanceDateDay   Int
+  gstStatus        GstStatus       @default(UNSURE)
+  sectorPack       String? // starter pack key
+  logoUrl          String?
+  accentColour     String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  years            FinancialYear[]
+  accounts         BankAccount[]
+  categories       Category[]
+  dimensions       Dimension[]
+
+  @@index([clerkUserId])
+}
+
+model FinancialYear {
+  id                 String              @id @default(cuid())
+  orgId              String
+  org                Organisation        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  startDate          DateTime
+  endDate            DateTime
+  status             YearStatus          @default(IN_PROGRESS)
+  detectedTier       ReportingTier?
+  tierOverride       ReportingTier? // opt-up only; validation enforces
+  priorYearSpendBand String? // rough answer used for provisional tier detection
+  isFirstYear        Boolean             @default(false)
+  comparatives       Json? // Layer-1 totals keyed by compliance code
+  imports            ImportBatch[]
+  groups             TransactionGroup[]
+  journals           JournalEntry[]
+  answers            InterviewAnswer[]
+  snapshots          StatementSnapshot[]
+  validations        ValidationResult[]
+
+  @@unique([orgId, endDate])
+}
+
+model BankAccount {
+  id                  String              @id @default(cuid())
+  orgId               String
+  org                 Organisation        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name                String
+  bankKey             String? // anz | asb | bnz | westpac | kiwibank | other
+  accountNumberMasked String?
+  createdAt           DateTime            @default(now())
+  transactions        SourceTransaction[]
+  imports             ImportBatch[]
+}
+
+model ImportBatch {
+  id            String        @id @default(cuid())
+  yearId        String
+  year          FinancialYear @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  accountId     String
+  account       BankAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  source        ImportSource
+  fileName      String?
+  fileUrl       String?
+  columnMapping Json? // generic-mapper config, remembered per account
+  // Verification invariant: openingBalance + sum(lines) must equal closingBalance
+  openingBalanceCents Int?
+  closingBalanceCents Int?
+  balancesVerified    Boolean @default(false)
+  periodStart   DateTime?
+  periodEnd     DateTime?
+  createdAt     DateTime      @default(now())
+  lines         SourceTransaction[]
+}
+
+model SourceTransaction {
+  id           String             @id @default(cuid())
+  batchId      String
+  batch        ImportBatch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  accountId    String
+  account      BankAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  date         DateTime
+  amountCents  Int // signed; positive = money in
+  payee        String?
+  particulars  String?
+  reference    String?
+  rawLine      Json
+  lineHash     String // dedupe across overlapping uploads
+  isTransfer   Boolean            @default(false) // matched inter-account transfer
+  importedCategory String? // category text carried over from the uploaded file itself
+  reversalOfId String?            @unique
+  reversalOf   SourceTransaction? @relation("Reversal", fields: [reversalOfId], references: [id])
+  reversedBy   SourceTransaction? @relation("Reversal")
+  splits       TransactionSplit[]
+  createdAt    DateTime           @default(now())
+
+  @@unique([accountId, lineHash])
+  @@index([accountId, date])
+}
+
+// Layer 2: the organisation's own categories. complianceCode references the
+// fixed Layer-1 list in lib/compliance/categories.ts (validated against that
+// list on write, never stored loosely).
+model Category {
+  id             String             @id @default(cuid())
+  orgId          String
+  org            Organisation       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name           String
+  complianceCode String
+  archived       Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  splits         TransactionSplit[]
+
+  @@unique([orgId, name])
+  @@index([orgId, complianceCode])
+}
+
+enum DimensionKind {
+  FUNDER
+  PROGRAMME
+  FUND // restricted/special purpose fund
+}
+
+model Dimension {
+  id         String             @id @default(cuid())
+  orgId      String
+  org        Organisation       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  kind       DimensionKind
   name       String
-  size       Int
-  mimeType   String
-  extension  String
-  docType    String
-  fileUrl    String
-  uploadedAt DateTime @default(now())
+  restricted Boolean            @default(false) // FUND only
+  splits     TransactionSplit[]
 
-  @@index([orderId])
+  @@unique([orgId, kind, name])
 }
 
-model Scan {
-  id        String   @id @default(cuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  scannedAt DateTime @default(now())
-  userAgent String?
-  ipAddress String?
+model TransactionGroup {
+  id     String             @id @default(cuid())
+  yearId String
+  year   FinancialYear      @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  label  String?
+  parked Boolean            @default(false) // parked groups block export
+  splits TransactionSplit[]
+}
 
-  @@index([orderId])
+// Allocation of source dollars to categories/dimensions. Splits for one
+// SourceTransaction must sum exactly to its amountCents (enforced in the
+// service layer inside a db transaction).
+model TransactionSplit {
+  id          String            @id @default(cuid())
+  sourceId    String
+  source      SourceTransaction @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  groupId     String?
+  group       TransactionGroup? @relation(fields: [groupId], references: [id])
+  categoryId  String?
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  funderId    String?
+  funder      Dimension?        @relation(fields: [funderId], references: [id])
+  amountCents Int
+  suggestion  Json? // {source: rule|memory|llm, confidence, rationale}
+  confirmedAt DateTime?
+
+  @@index([sourceId])
+  @@index([categoryId])
+}
+
+enum JournalKind {
+  ACCRUAL_AR
+  ACCRUAL_AP
+  GRANT_LIABILITY // documented expectations not yet satisfied
+  DEPRECIATION
+  DONATED_ASSET
+  OPENING_BALANCE
+  OTHER
+}
+
+model JournalEntry {
+  id         String           @id @default(cuid())
+  yearId     String
+  year       FinancialYear    @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  kind       JournalKind
+  provenance String // plain-language: which interview answer produced this
+  answerId   String?
+  answer     InterviewAnswer? @relation(fields: [answerId], references: [id])
+  reversesId String?          @unique
+  reverses   JournalEntry?    @relation("JReversal", fields: [reversesId], references: [id])
+  reversedBy JournalEntry?    @relation("JReversal")
+  lines      Json // [{complianceCode|ledgerAccount, amountCents (signed)}] — must sum to 0
+  createdAt  DateTime         @default(now())
+}
+
+model InterviewAnswer {
+  id          String         @id @default(cuid())
+  yearId      String
+  year        FinancialYear  @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  questionKey String
+  answer      Json
+  updatedAt   DateTime       @updatedAt
+  journals    JournalEntry[]
+
+  @@unique([yearId, questionKey])
+}
+
+model StatementSnapshot {
+  id        String        @id @default(cuid())
+  yearId    String
+  year      FinancialYear @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  tier      ReportingTier
+  model     Json // the full statement model the renderers consume
+  pdfUrl    String?
+  docxUrl   String?
+  createdAt DateTime      @default(now())
+}
+
+model ValidationResult {
+  id         String        @id @default(cuid())
+  yearId     String
+  year       FinancialYear @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  ruleKey    String
+  severity   String // blocker | warning | note
+  message    String
+  fixPath    String? // deep link to the fix
+  resolvedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  @@index([yearId, severity])
 }

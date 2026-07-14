@@ -5,6 +5,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Format signed cents as NZD. Pass whole:true to drop the cents. */
+export function nzd(cents: number, opts?: { whole?: boolean }) {
+  const digits = opts?.whole ? 0 : 2;
+  return (cents / 100).toLocaleString("en-NZ", {
+    style: "currency",
+    currency: "NZD",
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+}
+
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
   const k = 1024;
