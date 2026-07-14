@@ -70,7 +70,7 @@ export default function CategoryBars({
               {isActive && (
                 <div
                   className="pointer-events-none absolute right-0 top-full z-10 mt-1 rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-                  style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
+                  style={{ background: VIZ.tooltip, color: "#fff" }}>
                   {pct}% of {title.toLowerCase()}
                 </div>
               )}

@@ -138,6 +138,7 @@ model SourceTransaction {
   rawLine      Json
   lineHash     String // dedupe across overlapping uploads
   isTransfer   Boolean            @default(false) // matched inter-account transfer
+  importedCategory String? // category text carried over from the uploaded file itself
   reversalOfId String?            @unique
   reversalOf   SourceTransaction? @relation("Reversal", fields: [reversalOfId], references: [id])
   reversedBy   SourceTransaction? @relation("Reversal")

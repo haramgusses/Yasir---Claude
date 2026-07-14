@@ -53,7 +53,7 @@ const GUIDES: { bank: string; steps: string[] }[] = [
 
 export default function BankGuides() {
   return (
-    <div className="rounded-xl border border-line bg-white/[0.05] p-4">
+    <div className="rounded-xl border border-line bg-surface p-4">
       <p className="text-sm font-medium text-ink">
         How do I get a CSV from my bank?
       </p>
@@ -63,7 +63,7 @@ export default function BankGuides() {
       <div className="mt-2 divide-y divide-line">
         {GUIDES.map((g) => (
           <details key={g.bank} className="group py-1.5">
-            <summary className="flex cursor-pointer list-none items-center justify-between py-1 text-sm text-ink-soft hover:text-performa-cyan [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between py-1 text-sm text-ink-soft hover:text-performa-green [&::-webkit-details-marker]:hidden">
               {g.bank}
               <ChevronDown className="h-4 w-4 text-ink-mute transition-transform group-open:rotate-180" />
             </summary>

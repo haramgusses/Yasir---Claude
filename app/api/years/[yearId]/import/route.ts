@@ -107,6 +107,7 @@ export async function POST(req: Request, { params }: { params: { yearId: string 
           reference: line.reference || null,
           rawLine: line.raw,
           lineHash: hash,
+          importedCategory: line.importedCategory || null,
         })),
       },
     },

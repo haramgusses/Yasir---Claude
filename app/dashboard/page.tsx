@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import NewYearButton from "@/components/workspace/NewYearButton";
+import { UserButton } from "@clerk/nextjs";
+import { Logo } from "@/components/brand/Logo";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +42,16 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="animate-fade-in space-y-8">
+    <div className="min-h-screen">
+      <header className="border-b border-line bg-surface print:hidden">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+          <Link href="/dashboard" aria-label="Performa home">
+            <Logo />
+          </Link>
+          <UserButton afterSignOutUrl="/sign-in" />
+        </div>
+      </header>
+      <div className="mx-auto max-w-5xl animate-fade-in space-y-8 px-4 py-8 sm:px-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-ink">{org.name}</h1>
@@ -90,7 +101,7 @@ export default async function DashboardPage() {
 
                 <Link
                   href={`/dashboard/${year.id}/${p.nextStep}`}
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-performa-cyan hover:text-[#04262b]">
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-green px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-performa-green/90">
                   <NextIcon className="h-4 w-4" />
                   {next.label}
                   <ArrowRight className="h-4 w-4" />
@@ -98,13 +109,13 @@ export default async function DashboardPage() {
               </div>
 
               {p.total > 0 && (
-                <div className="flex items-end gap-6 border-t border-line bg-white/[0.03] px-5 py-3">
+                <div className="flex items-end gap-6 border-t border-line bg-surface-2 px-5 py-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between text-xs text-ink-mute">
                       <span>
                         {p.categorised} of {p.total} categorised
                       </span>
-                      <span className="font-medium text-performa-cyan">{p.pct}%</span>
+                      <span className="font-medium text-performa-green">{p.pct}%</span>
                     </div>
                     <ProgressBar value={p.pct} className="mt-1.5" />
                   </div>
@@ -116,6 +127,7 @@ export default async function DashboardPage() {
             </Card>
           );
         })}
+      </div>
       </div>
     </div>
   );

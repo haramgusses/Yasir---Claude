@@ -53,7 +53,7 @@ export default function Sparkbars({ months }: { months: SparkMonth[] }) {
       {a && (
         <div
           className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-          style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
+          style={{ background: VIZ.tooltip, color: "#fff" }}>
           <span className="font-semibold">{a.full}</span> · {nzd(a.inCents)} in ·{" "}
           {nzd(a.outCents)} out
         </div>

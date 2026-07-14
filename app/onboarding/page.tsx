@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Logo } from "@/components/brand/Logo";
-import Background from "@/components/fx/Background";
 import { Button } from "@/components/ui/Button";
 
 // Setup asks only for facts the data can't tell us (PLAN §3.5, §7):
@@ -22,7 +21,7 @@ const PACKS = [
 ];
 
 const inputCls =
-  "w-full rounded-lg border border-line-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-cyan bg-white/[0.05]";
+  "w-full rounded-lg border border-line-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-green bg-surface";
 const labelCls = "block text-sm font-medium text-ink-soft mb-1";
 
 export default function OnboardingPage() {
@@ -59,8 +58,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="relative min-h-screen">
-      <Background />
-      <div className="relative z-10 h-px bg-gradient-to-r from-transparent via-performa-cyan/60 to-transparent" />
+      <div className="h-1 bg-performa-green" />
       <div className="relative z-10 mx-auto max-w-xl px-4 py-12">
         <Logo className="mb-8" />
         <h1 className="text-2xl font-semibold text-ink">
@@ -71,7 +69,7 @@ export default function OnboardingPage() {
           you the rest of the way. We work out the right report format for you.
         </p>
 
-        <form onSubmit={submit} className="mt-8 space-y-6 glass rounded-2xl p-6 shadow-card">
+        <form onSubmit={submit} className="mt-8 space-y-6 rounded-xl border border-line bg-surface p-6 shadow-card">
           <div>
             <label className={labelCls} htmlFor="name">Organisation name</label>
             <input id="name" required className={inputCls} value={form.name}

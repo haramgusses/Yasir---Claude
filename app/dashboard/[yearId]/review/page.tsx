@@ -205,17 +205,17 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
         </div>
         <ul className="mt-3 space-y-2">
           {blockers.map((m) => (
-            <li key={m} className="flex items-start gap-2 text-sm text-red-300">
+            <li key={m} className="flex items-start gap-2 text-sm text-clay">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {m}
             </li>
           ))}
           {warnings.map((m) => (
-            <li key={m} className="flex items-start gap-2 text-sm text-amber-300">
+            <li key={m} className="flex items-start gap-2 text-sm text-amberink">
               <Info className="mt-0.5 h-4 w-4 shrink-0" /> {m}
             </li>
           ))}
           {ready && warnings.length === 0 && (
-            <li className="flex items-start gap-2 text-sm text-emerald-300">
+            <li className="flex items-start gap-2 text-sm text-performa-green">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> All checks pass. This draft
               still needs your committee&apos;s approval and signatures before filing.
             </li>
@@ -224,7 +224,7 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
       </Card>
 
       {/* Statement preview — rendered as physical paper on the dark UI */}
-      <div className="paper rounded-2xl p-8 shadow-lift print:rounded-none print:p-0 print:shadow-none">
+      <Card className="p-8 print:border-0 print:p-0 print:shadow-none">
         <div className="text-center">
           <h1 className="text-xl font-semibold text-slate-900">{year.org.name}</h1>
           <p className="mt-1 text-sm text-slate-600">
@@ -297,7 +297,7 @@ export default async function ReviewPage({ params }: { params: { yearId: string 
           (entity information, statement of service performance, financial position and
           notes) is assembled at export — coming in the next build stage.
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -315,10 +315,10 @@ function StatCard({
 }) {
   const ring =
     tone === "in"
-      ? "text-emerald-400 bg-emerald-400/10"
+      ? "text-performa-green bg-performa-soft"
       : tone === "out"
-        ? "text-ink-soft bg-white/[0.06]"
-        : "text-performa-cyan bg-performa-cyan/10";
+        ? "text-ink-soft bg-surface-2"
+        : "text-performa-green bg-performa-soft";
   return (
     <Card className="flex items-center gap-3 p-4">
       <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${ring}`}>

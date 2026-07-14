@@ -81,7 +81,24 @@ export function suggestCategory(line: {
   payee: string;
   particulars: string;
   reference: string;
+  importedCategory?: string | null;
 }): RuleSuggestion | null {
+  // A category the user's own file carried beats any pattern rule: they (or
+  // their previous tool) already made this call — we carry it over and map
+  // it onto the nearest compliance code.
+  if (line.importedCategory?.trim()) {
+    const name = line.importedCategory.trim();
+    const mapped = suggestCategory({ ...line, importedCategory: null, particulars: `${line.particulars} ${name}` });
+    return {
+      complianceCode:
+        mapped?.complianceCode ??
+        (line.amountCents >= 0 ? "T3_REV_OTHER" : "T3_EXP_OTHER"),
+      categoryName: name,
+      confidence: 0.95,
+      rationale: "Carried over from a category column in your file",
+      ruleKey: "imported-category",
+    };
+  }
   const haystack = `${line.payee} ${line.particulars} ${line.reference}`.toUpperCase();
   const dir = line.amountCents >= 0 ? 1 : -1;
   for (const rule of RULES) {

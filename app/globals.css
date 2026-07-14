@@ -3,50 +3,22 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --radius: 0.75rem;
-  }
   * {
     @apply border-line;
   }
   body {
-    @apply bg-abyss text-ink antialiased;
-    font-feature-settings: "cv11", "ss01";
-    font-variation-settings: "opsz" 32;
+    @apply bg-paper text-ink antialiased;
   }
-  h1, h2, h3 {
-    @apply tracking-tight;
+  h1,
+  h2 {
+    @apply font-serif tracking-tight;
   }
   ::selection {
-    background: rgba(48, 207, 195, 0.28);
-  }
-}
-
-@layer components {
-  /* Frosted dark panel — the app's standard surface over the live background */
-  .glass {
-    background: linear-gradient(165deg, rgba(23, 34, 72, 0.72), rgba(12, 19, 44, 0.68));
-    backdrop-filter: blur(14px) saturate(1.15);
-    -webkit-backdrop-filter: blur(14px) saturate(1.15);
-    border: 1px solid rgba(225, 229, 242, 0.09);
-  }
-  /* The statement document renders as physical white paper on the dark UI */
-  .paper {
-    background: #ffffff;
-    color: #0f172a;
+    background: rgba(75, 185, 67, 0.25);
   }
 }
 
 @layer utilities {
-  .bg-brand-gradient {
-    background-image: linear-gradient(135deg, #112a61 0%, #11a4ac 62%, #30cfc3 100%);
-  }
-  .text-brand-gradient {
-    background-image: linear-gradient(120deg, #7de3d8, #30cfc3 45%, #6ea8ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
   .animate-fade-in {
     animation: fadeIn 0.35s ease-out both;
   }
@@ -56,7 +28,6 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
-  /* Micro-interaction: tactile press on any interactive element */
   .press {
     transition: transform 0.12s ease;
   }
@@ -74,103 +45,16 @@
   to { opacity: 1; transform: none; }
 }
 
-/* ------------------------------------------------------------------ */
-/* The living background: a slow aurora of deep blues + teal, GPU-only
-   (transform/opacity), with a film-grain overlay. Sits behind all
-   content; disabled entirely for reduced-motion and print.            */
-/* ------------------------------------------------------------------ */
-.aurora {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.aurora::after {
-  /* film grain — static SVG turbulence, barely-there */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-}
-.aurora__blob {
-  position: absolute;
-  width: 55vmax;
-  height: 55vmax;
-  border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.55;
-  will-change: transform;
-}
-.aurora__blob--1 {
-  top: -20vmax;
-  left: -12vmax;
-  background: radial-gradient(circle at 35% 35%, rgba(17, 42, 97, 0.9), transparent 65%);
-  animation: drift1 52s ease-in-out infinite alternate;
-}
-.aurora__blob--2 {
-  bottom: -24vmax;
-  right: -14vmax;
-  background: radial-gradient(circle at 60% 45%, rgba(13, 84, 92, 0.65), transparent 65%);
-  animation: drift2 64s ease-in-out infinite alternate;
-}
-.aurora__blob--3 {
-  top: 20%;
-  left: 45%;
-  width: 38vmax;
-  height: 38vmax;
-  background: radial-gradient(circle at 50% 50%, rgba(48, 207, 195, 0.16), transparent 60%);
-  animation: drift3 44s ease-in-out infinite alternate;
-}
-@keyframes drift1 {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(9vmax, 6vmax, 0) scale(1.15); }
-}
-@keyframes drift2 {
-  from { transform: translate3d(0, 0, 0) scale(1.1); }
-  to { transform: translate3d(-8vmax, -5vmax, 0) scale(0.95); }
-}
-@keyframes drift3 {
-  from { transform: translate3d(0, 0, 0) scale(0.9); }
-  to { transform: translate3d(-10vmax, 8vmax, 0) scale(1.2); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .aurora__blob {
-    animation: none;
-  }
   .animate-fade-in,
   .animate-rise {
     animation: none;
   }
 }
 
-::-webkit-scrollbar {
-  width: 11px;
-  height: 11px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(225, 229, 242, 0.18);
-  border-radius: 9999px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(225, 229, 242, 0.32);
-  background-clip: content-box;
-}
-
-/* Print: pure paper — no dark UI, no background layers */
 @media print {
   body {
     background: #fff !important;
-    color: #0f172a !important;
-  }
-  .aurora,
-  canvas {
-    display: none !important;
   }
   @page {
     margin: 16mm;

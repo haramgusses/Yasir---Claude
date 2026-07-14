@@ -3,17 +3,17 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const button = cva(
-  "press inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-performa-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-abyss disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap",
+  "press inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-performa-green focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap",
   {
     variants: {
       variant: {
-        primary:
-          "bg-performa-teal text-white shadow-[0_0_0_1px_rgba(48,207,195,0.25),0_8px_24px_-12px_rgba(17,164,172,0.8)] hover:bg-performa-cyan hover:text-[#04262b]",
-        navy: "bg-performa-navy text-white hover:bg-[#1a3a7f]",
+        primary: "bg-performa-forest text-white hover:bg-[#0d3d1c] shadow-card",
+        green: "bg-performa-green text-white hover:bg-[#186349]",
+        navy: "bg-performa-forest text-white hover:bg-[#0d3d1c]",
         outline:
-          "border border-line-strong bg-white/[0.04] text-ink-soft hover:border-performa-cyan/60 hover:text-ink",
-        ghost: "text-ink-soft hover:bg-white/[0.07] hover:text-ink",
-        danger: "bg-red-500/90 text-white hover:bg-red-500",
+          "border border-line-strong bg-surface text-ink hover:border-performa-green/50 hover:bg-surface-2",
+        ghost: "text-ink-soft hover:bg-performa-soft hover:text-ink",
+        danger: "bg-clay text-white hover:bg-[#8f371f]",
       },
       size: {
         sm: "h-8 px-3 text-xs",

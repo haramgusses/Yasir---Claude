@@ -1,106 +1,61 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
   ],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: { "2xl": "1400px" },
-    },
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -12px rgba(2,6,23,0.8)",
-        lift: "0 24px 48px -16px rgba(2,6,23,0.9)",
+        card: "0 1px 2px rgba(20,48,43,0.04), 0 4px 16px rgba(20,48,43,0.05)",
+        lift: "0 8px 40px rgba(20,48,43,0.12)",
       },
       colors: {
-        // Performa brand palette
+        // Performa brand — light, warm, forest-green (from the approved mock)
         performa: {
-          navy: "#112A61",
-          teal: "#11A4AC",
-          cyan: "#30CFC3",
-          onyx: "#262626",
+          brand: "#4bb943", // fresh green wordmark
+          forest: "#06280f", // sidebar / brand ink
+          green: "#1f7a5c", // primary action green
+          soft: "#e6f2ec", // green-tinted surface
+          // legacy keys kept so older class references stay sensible
+          navy: "#14302b",
+          teal: "#1f7a5c",
+          cyan: "#1f7a5c",
+          onyx: "#06280f",
         },
-        // Dark fintech surface & ink tokens
         ink: {
-          DEFAULT: "#e8ecf8",
-          soft: "#aab3d0",
-          mute: "#7c86a8",
+          DEFAULT: "#14302b",
+          soft: "#3a5650",
+          mute: "#6b827c",
         },
         line: {
-          DEFAULT: "rgba(225,229,242,0.09)",
-          strong: "rgba(225,229,242,0.18)",
+          DEFAULT: "#e0e4df",
+          strong: "#cdd4cd",
         },
         surface: {
-          DEFAULT: "rgba(18,27,58,0.62)",
-          2: "rgba(225,229,242,0.06)",
+          DEFAULT: "#ffffff",
+          2: "#fbfcfa",
         },
-        abyss: "#070d1f",
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
+        paper: "#f3f4f1",
+        clay: { DEFAULT: "#a8412b", soft: "#f6e4df" },
+        amberink: { DEFAULT: "#9a6a16", soft: "#f6edda" },
+        abyss: "#f3f4f1",
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        DEFAULT: "10px",
+        lg: "10px",
+        xl: "12px",
+        "2xl": "14px",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 };
-
 export default config;

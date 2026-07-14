@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import { requireYear, yearProgress } from "@/lib/years";
 import { nzd } from "@/lib/utils";
-import StepNav from "@/components/workspace/StepNav";
+import Sidebar from "@/components/workspace/Sidebar";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export default async function YearLayout({
@@ -18,44 +17,55 @@ export default async function YearLayout({
   const p = await yearProgress(year.id);
 
   return (
-    <div className="animate-fade-in">
-      <Link
-        href="/dashboard"
-        className="mb-3 inline-flex items-center gap-1 text-xs text-ink-mute hover:text-performa-cyan print:hidden">
-        <ChevronLeft className="h-3.5 w-3.5" />
-        {year.org.name} · year ended {year.endDate.toISOString().slice(0, 10)}
-      </Link>
-
-      <StepNav
+    <div className="min-h-screen">
+      <Sidebar
         yearId={year.id}
-        done={{ upload: p.uploadDone, categorise: p.categoriseDone }}
-        counts={{ uncategorised: p.uncategorised, unverified: p.unverified }}
+        orgName={year.org.name}
+        yearEndIso={year.endDate.toISOString().slice(0, 10)}
+        steps={{
+          importDone: p.uploadDone,
+          categoriseDone: p.categoriseDone,
+          reconcileDone: p.uploadDone && p.unverified === 0,
+          uncategorised: p.uncategorised,
+          unverified: p.unverified,
+        }}
       />
 
-      {p.total > 0 && (
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-line bg-white/[0.05] px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between print:hidden">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between text-xs text-ink-mute">
-              <span>
-                {p.categorised} of {p.total} transactions categorised
-              </span>
-              <span className="font-medium text-performa-cyan">{p.pct}%</span>
-            </div>
-            <ProgressBar value={p.pct} className="mt-1.5" />
+      <div className="lg:pl-60 print:pl-0">
+        <header className="hidden h-12 items-center justify-between border-b border-line bg-surface px-6 lg:flex print:hidden">
+          <div className="text-sm text-ink-mute">
+            <span className="font-medium text-ink">{year.org.name}</span> · year ended{" "}
+            {year.endDate.toISOString().slice(0, 10)}
           </div>
-          <div className="flex gap-5 text-sm sm:pl-6">
-            <Stat label="Money in" value={nzd(p.inCents, { whole: true })} tone="in" />
-            <Stat label="Money out" value={nzd(p.outCents, { whole: true })} tone="out" />
-            <Stat
-              label={p.surplusCents >= 0 ? "Surplus" : "Deficit"}
-              value={nzd(Math.abs(p.surplusCents), { whole: true })}
-              tone="net"
-            />
-          </div>
-        </div>
-      )}
+          <UserButton afterSignOutUrl="/sign-in" />
+        </header>
 
-      <div className="mt-6">{children}</div>
+        <main className="mx-auto max-w-4xl animate-fade-in px-4 py-8 sm:px-6">
+          {p.total > 0 && (
+            <div className="mb-6 flex flex-col gap-3 rounded-xl border border-line bg-surface px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between print:hidden">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between text-xs text-ink-mute">
+                  <span>
+                    {p.categorised} of {p.total} transactions categorised
+                  </span>
+                  <span className="font-medium text-performa-green">{p.pct}%</span>
+                </div>
+                <ProgressBar value={p.pct} className="mt-1.5" />
+              </div>
+              <div className="flex gap-5 text-sm sm:pl-6">
+                <Stat label="Money in" value={nzd(p.inCents, { whole: true })} tone="in" />
+                <Stat label="Money out" value={nzd(p.outCents, { whole: true })} tone="out" />
+                <Stat
+                  label={p.surplusCents >= 0 ? "Surplus" : "Deficit"}
+                  value={nzd(Math.abs(p.surplusCents), { whole: true })}
+                  tone="net"
+                />
+              </div>
+            </div>
+          )}
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
@@ -67,10 +77,10 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: "in"
       <div
         className={
           tone === "in"
-            ? "font-semibold tabular-nums text-emerald-400"
+            ? "font-mono font-semibold tabular-nums text-performa-green"
             : tone === "out"
-              ? "font-semibold tabular-nums text-ink-soft"
-              : "font-semibold tabular-nums text-performa-cyan"
+              ? "font-mono font-semibold tabular-nums text-ink-soft"
+              : "font-mono font-semibold tabular-nums text-ink"
         }>
         {value}
       </div>

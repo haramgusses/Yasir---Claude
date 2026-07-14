@@ -141,8 +141,7 @@ export default function MonthlyFlow({ months }: { months: MonthFlow[] }) {
             style={{
               left: `${((PAD.left + slot * active + slot / 2) / W) * 100}%`,
               top: 0,
-              background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)",
-              color: VIZ.ink,
+              background: VIZ.tooltip, color: "#fff",
             }}>
             <div className="font-semibold">{a.full}</div>
             <div className="mt-1 flex items-center gap-1.5 whitespace-nowrap">

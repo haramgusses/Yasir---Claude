@@ -28,8 +28,8 @@ export default function CoverageTimeline({ accounts }: { accounts: AccountCovera
           </span>
           <span className="inline-flex items-center gap-1.5">
             <svg width="10" height="10" className="rounded-sm" aria-hidden="true">
-              <rect width="10" height="10" fill="rgba(251,191,36,0.16)" />
-              <path d="M-2 4 L4 -2 M0 12 L12 0 M6 14 L14 6" stroke="#f59e0b" strokeWidth="1.4" />
+              <rect width="10" height="10" fill="#fdf1d7" />
+              <path d="M-2 4 L4 -2 M0 12 L12 0 M6 14 L14 6" stroke="#9a6a16" strokeWidth="1.4" />
             </svg>
             Missing
           </span>
@@ -61,13 +61,13 @@ export default function CoverageTimeline({ accounts }: { accounts: AccountCovera
                         ? { background: VIZ.green }
                         : {
                             background:
-                              "repeating-linear-gradient(45deg, rgba(251,191,36,0.10), rgba(251,191,36,0.10) 3px, rgba(245,158,11,0.55) 3px, rgba(245,158,11,0.55) 5px)",
+                              "repeating-linear-gradient(45deg, #fdf1d7, #fdf1d7 3px, #d9a23a 3px, #d9a23a 5px)",
                           }
                     }>
                     {tip === key && (
                       <span
                         className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs shadow-lift"
-                        style={{ background: VIZ.tooltip, border: "1px solid rgba(225,229,242,0.16)", color: VIZ.ink }}>
+                        style={{ background: VIZ.tooltip, color: "#fff" }}>
                         {m.full} — {m.covered ? "covered" : "missing"}
                       </span>
                     )}

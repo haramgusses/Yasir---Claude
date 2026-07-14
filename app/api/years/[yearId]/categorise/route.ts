@@ -11,6 +11,8 @@ const Body = z.object({
     .object({ name: z.string().min(1).max(100), complianceCode: z.string() })
     .optional(),
   funderName: z.string().max(150).optional(),
+  /** Re-categorise: replace any existing allocation on these lines. */
+  replace: z.boolean().optional(),
 });
 
 export async function POST(req: Request, { params }: { params: { yearId: string } }) {
@@ -63,6 +65,14 @@ export async function POST(req: Request, { params }: { params: { yearId: string 
   // runs inside a transaction to narrow the double-allocation window; the
   // review page's double-allocation check catches anything that slips past.
   const allocated = await prisma.$transaction(async (tx) => {
+    if (b.replace) {
+      await tx.transactionSplit.deleteMany({
+        where: {
+          sourceId: { in: b.transactionIds },
+          source: { batch: { yearId: year.id } },
+        },
+      });
+    }
     const lines = await tx.sourceTransaction.findMany({
       where: {
         id: { in: b.transactionIds },

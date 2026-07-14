@@ -6,10 +6,7 @@ export function Card({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        "glass rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-lift",
-        className
-      )}
+      className={cn("rounded-xl border border-line bg-surface shadow-card", className)}
       {...props}
     />
   );

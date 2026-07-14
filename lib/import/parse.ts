@@ -14,6 +14,8 @@ export interface ParsedLine {
   reference: string;
   /** Running balance after this line, when the export includes one. */
   balanceCents?: number;
+  /** Category text found in the file itself (a pre-coded export), carried over. */
+  importedCategory?: string;
   raw: Record<string, string>;
 }
 
@@ -179,6 +181,37 @@ function detectProfile(headers: string[]): BankProfile | null {
 }
 
 /**
+ * Find a column that carries the user's OWN categorisation (a pre-coded
+ * export from Xero/a spreadsheet where someone already sorted each line).
+ * Heuristics: header sounds category-ish, column isn't one we already map,
+ * values are mostly non-numeric text with plenty of repetition (categories
+ * repeat; free-text descriptions don't).
+ */
+function detectCategoryColumn(
+  headers: string[],
+  dataRows: string[][],
+  usedIndexes: number[]
+): number {
+  const CANDIDATE = /categor|classif|coding|gl ?code|account ?name|expense type|income type|^tag/i;
+  for (let i = 0; i < headers.length; i++) {
+    if (usedIndexes.includes(i)) continue;
+    if (!CANDIDATE.test(headers[i])) continue;
+    const values = dataRows
+      .map((r) => (i < r.length ? r[i].trim() : ""))
+      .filter((v) => v !== "");
+    if (values.length < Math.max(2, dataRows.length * 0.3)) continue;
+    const nonNumeric = values.filter(
+      (v) => parseAmountCents(v) === null && parseDateISO(v) === null
+    );
+    if (nonNumeric.length < values.length * 0.8) continue;
+    const distinct = new Set(values.map((v) => v.toLowerCase())).size;
+    if (distinct > Math.max(30, values.length * 0.6)) continue; // free text, not categories
+    return i;
+  }
+  return -1;
+}
+
+/**
  * Parse a bank CSV export. Uses a detected bank profile, or `mapping` when
  * supplied (the generic mapper — column names as they appear in the file).
  */
@@ -210,6 +243,12 @@ export function parseBankCsv(text: string, mapping?: ColumnMapping): ParseResult
     return { lines: [], profileKey: profile?.key ?? "custom", warnings: ["Mapped columns not found in the file header."], rejectedRows };
   }
 
+  const categoryIx = detectCategoryColumn(
+    header.headers,
+    rows.slice(header.index + 1),
+    Object.values(ix).filter((i) => i >= 0)
+  );
+
   const lines: ParsedLine[] = [];
   for (let r = header.index + 1; r < rows.length; r++) {
     const cells = rows[r];
@@ -235,6 +274,7 @@ export function parseBankCsv(text: string, mapping?: ColumnMapping): ParseResult
     const balance = ix.balance >= 0 ? parseAmountCents(get(ix.balance)) : null;
     const raw: Record<string, string> = {};
     header.headers.forEach((h, i) => (raw[h] = get(i)));
+    const importedCategory = categoryIx >= 0 ? get(categoryIx) : "";
     lines.push({
       date,
       amountCents,
@@ -242,6 +282,7 @@ export function parseBankCsv(text: string, mapping?: ColumnMapping): ParseResult
       particulars: get(ix.particulars),
       reference: get(ix.reference),
       ...(balance !== null ? { balanceCents: balance } : {}),
+      ...(importedCategory ? { importedCategory } : {}),
       raw,
     });
   }

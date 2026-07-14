@@ -6,11 +6,11 @@ const badge = cva(
   {
     variants: {
       tone: {
-        teal: "bg-performa-cyan/10 text-performa-cyan ring-performa-cyan/25",
-        green: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/25",
-        amber: "bg-amber-400/10 text-amber-300 ring-amber-400/25",
-        red: "bg-red-400/10 text-red-300 ring-red-400/25",
-        slate: "bg-white/[0.06] text-ink-mute ring-line-strong",
+        teal: "bg-performa-soft text-performa-green ring-performa-green/20",
+        green: "bg-performa-soft text-performa-green ring-performa-green/20",
+        amber: "bg-amberink-soft text-amberink ring-amberink/20",
+        red: "bg-clay-soft text-clay ring-clay/20",
+        slate: "bg-surface-2 text-ink-mute ring-line-strong",
       },
     },
     defaultVariants: { tone: "slate" },

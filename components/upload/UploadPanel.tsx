@@ -14,7 +14,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BankGuides from "@/components/upload/BankGuides";
-import CoverageTimeline, { type AccountCoverage } from "@/components/viz/CoverageTimeline";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -43,14 +42,12 @@ export default function UploadPanel({
   yearStart,
   yearEnd,
   accounts,
-  coverage,
   canContinue,
 }: {
   yearId: string;
   yearStart: string;
   yearEnd: string;
   accounts: Account[];
-  coverage: AccountCoverage[];
   canContinue: boolean;
 }) {
   const router = useRouter();
@@ -117,16 +114,10 @@ export default function UploadPanel({
         </p>
       </div>
 
-      {coverage.length > 0 && (
-        <Card className="p-5">
-          <CoverageTimeline accounts={coverage} />
-        </Card>
-      )}
-
       {accounts.length === 0 && (
         <Card className="border-dashed p-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-performa-teal/10">
-            <Building2 className="h-6 w-6 text-performa-teal" />
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-performa-soft">
+            <Building2 className="h-6 w-6 text-performa-green" />
           </div>
           <p className="mt-3 text-sm font-medium text-ink">Start by adding a bank account</p>
           <p className="mx-auto mt-1 max-w-md text-xs text-ink-mute">
@@ -141,7 +132,7 @@ export default function UploadPanel({
         <Card key={a.id} className="p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.06]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-2">
                 <Building2 className="h-5 w-5 text-ink-mute" />
               </span>
               <div className="font-medium text-ink">{a.name}</div>
@@ -163,10 +154,10 @@ export default function UploadPanel({
             className={cn(
               "mt-4 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed py-6 text-center transition-colors",
               dragOver === a.id
-                ? "border-performa-teal bg-performa-teal/5"
-                : "border-line hover:border-performa-teal/60 hover:bg-white/[0.06]"
+                ? "border-performa-green bg-performa-soft"
+                : "border-line hover:border-performa-green/60 hover:bg-surface-2"
             )}>
-            <FileSpreadsheet className="h-6 w-6 text-performa-teal" />
+            <FileSpreadsheet className="h-6 w-6 text-performa-green" />
             <span className="text-sm font-medium text-ink-soft">
               {busy === a.id ? "Reading your file…" : "Drop a CSV here, or click to choose"}
             </span>
@@ -203,7 +194,7 @@ export default function UploadPanel({
                       <CheckCircle2 className="h-3.5 w-3.5" /> Balances
                     </Badge>
                   ) : (
-                    <BalanceForm yearId={yearId} batchId={b.id} onDone={() => router.refresh()} />
+                    <Badge tone="amber">Balance check on the Reconcile step</Badge>
                   )}
                 </li>
               ))}
@@ -211,7 +202,7 @@ export default function UploadPanel({
           )}
 
           {a.batches.length === 0 && accounts.some((x) => x.batches.length > 0) && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amberink/30 bg-amberink-soft px-3 py-2 text-xs text-amberink">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 No statements uploaded for this account yet — if it had any activity
@@ -221,7 +212,7 @@ export default function UploadPanel({
           )}
 
           {a.batches.length > 0 && a.gaps.length > 0 && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-amberink/30 bg-amberink-soft px-3 py-2 text-xs text-amberink">
               <CalendarClock className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 Missing period{a.gaps.length > 1 ? "s" : ""}:{" "}
@@ -235,7 +226,7 @@ export default function UploadPanel({
 
       <form onSubmit={addAccount} className="flex gap-2">
         <input
-          className="flex-1 rounded-lg border border-line-strong bg-white/[0.05] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-cyan"
+          className="flex-1 rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-performa-green"
           placeholder='Add another account, e.g. "Everyday account" or "Savings"'
           value={newAccount}
           onChange={(e) => setNewAccount(e.target.value)}
@@ -246,9 +237,9 @@ export default function UploadPanel({
       </form>
 
       {canContinue && (
-        <Card className="flex flex-col gap-3 border-performa-teal/30 bg-performa-teal/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <Card className="flex flex-col gap-3 border-performa-green/30 bg-performa-soft p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-performa-teal" />
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-performa-green" />
             <div>
               <p className="text-sm font-medium text-ink">
                 All statements verified — everything adds up
@@ -261,7 +252,7 @@ export default function UploadPanel({
           </div>
           <Link
             href={`/dashboard/${yearId}/categorise`}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-teal px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-cyan hover:text-[#04262b]">
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-performa-green px-4 py-2.5 text-sm font-medium text-white hover:bg-performa-green/90">
             Continue to categorise <ChevronRight className="h-4 w-4" />
           </Link>
         </Card>
@@ -269,94 +260,5 @@ export default function UploadPanel({
 
       <BankGuides />
     </div>
-  );
-}
-
-// Manual balance entry for exports without a running-balance column — closes
-// the verification gate with two numbers from the user's statement.
-function BalanceForm({
-  yearId,
-  batchId,
-  onDone,
-}: {
-  yearId: string;
-  batchId: string;
-  onDone: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [opening, setOpening] = useState("");
-  const [closing, setClosing] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    let res: Response;
-    try {
-      res = await fetch(`/api/years/${yearId}/import`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          batchId,
-          openingBalanceCents: Math.round(parseFloat(opening) * 100),
-          closingBalanceCents: Math.round(parseFloat(closing) * 100),
-        }),
-      });
-    } catch {
-      toast.error("Couldn't reach the server — check your connection and try again.");
-      return;
-    } finally {
-      setBusy(false);
-    }
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      toast.error(body.error ?? "Couldn't save those balances.");
-      return;
-    }
-    if (body.balanceCheck?.ok) {
-      toast.success("It balances — opening plus transactions matches closing.");
-    } else {
-      toast.warning(
-        body.balanceCheck?.message ?? "Those balances don't tie to the transactions.",
-        { duration: 10000 }
-      );
-    }
-    onDone();
-  }
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-xs font-medium text-amber-300 hover:bg-amber-400/25">
-        <AlertTriangle className="h-3.5 w-3.5" /> Enter balances
-      </button>
-    );
-  }
-  return (
-    <form onSubmit={save} className="flex items-center gap-1.5">
-      <input
-        required
-        type="number"
-        step="0.01"
-        placeholder="Opening $"
-        value={opening}
-        onChange={(e) => setOpening(e.target.value)}
-        className="w-24 rounded border border-line-strong bg-white/[0.05] px-2 py-1 text-xs"
-      />
-      <input
-        required
-        type="number"
-        step="0.01"
-        placeholder="Closing $"
-        value={closing}
-        onChange={(e) => setClosing(e.target.value)}
-        className="w-24 rounded border border-line-strong bg-white/[0.05] px-2 py-1 text-xs"
-      />
-      <Button type="submit" size="sm" loading={busy}>
-        Check
-      </Button>
-    </form>
   );
 }

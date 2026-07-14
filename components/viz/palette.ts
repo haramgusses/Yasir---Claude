@@ -5,14 +5,14 @@
 // on white — dataviz six-checks validator, light mode). The originals are
 // too dark/grey for marks, so they serve as ink and chrome instead.
 export const VIZ = {
-  ink: "#e8ecf8", // primary chart text
-  muted: "#9aa4c7", // axis labels, secondary text
-  grid: "rgba(225,229,242,0.13)", // gridlines, bar tracks
-  surface: "transparent", // charts sit on glass panels
-  green: "#25a06e", // data hue A — money in (dark-surface validated)
-  plum: "#a87ec0", // data hue B — money out (dark-surface validated)
-  deep: "#30cfc3", // emphasis accent
-  tooltip: "#0d1531", // tooltip surface on dark
+  ink: "#14302b", // primary chart text
+  muted: "#6b827c", // axis labels, secondary text
+  grid: "#e0e4df", // gridlines, bar tracks
+  surface: "#ffffff", // charts sit on white cards
+  green: "#1a7f5a", // data hue A — money in (light-surface validated)
+  plum: "#8f63a1", // data hue B — money out (light-surface validated)
+  deep: "#1f7a5c", // emphasis accent
+  tooltip: "#14302b", // dark tooltip surface (white text)
 } as const;
 
 export const nzdShort = (cents: number) => {
